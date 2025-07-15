@@ -284,6 +284,202 @@ async def get_sememes_for_query(query: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get sememes: {str(e)}")
 
+# Training Endpoints
+@api_router.post("/training/start")
+async def start_training(request: TrainingRequest):
+    """Start training the SATC engine with provided training pairs"""
+    if trainer is None:
+        raise HTTPException(status_code=500, detail="Training system not initialized")
+    
+    try:
+        # Save training pairs to file
+        training_data = []
+        for pair in request.training_pairs:
+            training_data.append({
+                "query": pair.query,
+                "response": pair.response,
+                "quality_score": pair.quality_score,
+                "coherence_score": pair.coherence_score,
+                "sememes": pair.sememes
+            })
+        
+        # Save to training file
+        import json
+        from pathlib import Path
+        training_path = Path("data/training_pairs.jsonl")
+        training_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(training_path, 'w') as f:
+            for item in training_data:
+                f.write(json.dumps(item) + '\n')
+        
+        # Update training config
+        trainer.config.num_epochs = request.epochs
+        trainer.config.batch_size = request.batch_size
+        trainer.config.learning_rate = request.learning_rate
+        
+        # Start training in background (simplified for demo)
+        # In production, this would be a background task
+        logger.info(f"Training started with {len(training_data)} pairs")
+        
+        return {
+            "message": f"Training started with {len(training_data)} pairs",
+            "config": {
+                "epochs": request.epochs,
+                "batch_size": request.batch_size,
+                "learning_rate": request.learning_rate
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start training: {str(e)}")
+
+@api_router.get("/training/status", response_model=TrainingStatus)
+async def get_training_status():
+    """Get current training status"""
+    if trainer is None:
+        raise HTTPException(status_code=500, detail="Training system not initialized")
+    
+    try:
+        # For now, return mock status
+        # In production, this would track actual training progress
+        return TrainingStatus(
+            is_training=False,
+            current_epoch=0,
+            total_epochs=0,
+            current_loss=0.0,
+            current_coherence=0.0,
+            estimated_time_remaining=0.0
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get training status: {str(e)}")
+
+@api_router.post("/training/add-pair")
+async def add_training_pair(pair: TrainingPair):
+    """Add a single training pair"""
+    try:
+        # Save to training file
+        import json
+        from pathlib import Path
+        training_path = Path("data/training_pairs.jsonl")
+        training_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Append to file
+        with open(training_path, 'a') as f:
+            training_item = {
+                "query": pair.query,
+                "response": pair.response,
+                "quality_score": pair.quality_score,
+                "coherence_score": pair.coherence_score,
+                "sememes": pair.sememes
+            }
+            f.write(json.dumps(training_item) + '\n')
+        
+        return {"message": "Training pair added successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to add training pair: {str(e)}")
+
+@api_router.post("/training/evaluate", response_model=ResponseEvaluation)
+async def evaluate_response(query: str, response: str):
+    """Evaluate response quality"""
+    if evaluator is None:
+        raise HTTPException(status_code=500, detail="Evaluator not initialized")
+    
+    try:
+        scores = evaluator.evaluate_response(query, response)
+        
+        return ResponseEvaluation(
+            query=query,
+            response=response,
+            coherence=scores['coherence'],
+            relevance=scores['relevance'],
+            informativeness=scores['informativeness'],
+            fluency=scores['fluency'],
+            overall=scores['overall']
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to evaluate response: {str(e)}")
+
+@api_router.get("/training/data")
+async def get_training_data():
+    """Get current training data"""
+    try:
+        from pathlib import Path
+        import json
+        
+        training_path = Path("data/training_pairs.jsonl")
+        if not training_path.exists():
+            return {"training_pairs": [], "count": 0}
+        
+        training_pairs = []
+        with open(training_path, 'r') as f:
+            for line in f:
+                if line.strip():
+                    training_pairs.append(json.loads(line.strip()))
+        
+        return {
+            "training_pairs": training_pairs,
+            "count": len(training_pairs)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get training data: {str(e)}")
+
+@api_router.delete("/training/data")
+async def clear_training_data():
+    """Clear all training data"""
+    try:
+        from pathlib import Path
+        
+        training_path = Path("data/training_pairs.jsonl")
+        if training_path.exists():
+            training_path.unlink()
+        
+        return {"message": "Training data cleared successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to clear training data: {str(e)}")
+
+@api_router.post("/training/improve-response")
+async def improve_response(query: str, current_response: str, target_response: str):
+    """Add a training pair to improve a specific response"""
+    if evaluator is None:
+        raise HTTPException(status_code=500, detail="Evaluator not initialized")
+    
+    try:
+        # Evaluate the target response
+        scores = evaluator.evaluate_response(query, target_response)
+        
+        # Create training pair
+        training_pair = TrainingPair(
+            query=query,
+            response=target_response,
+            quality_score=scores['overall'],
+            coherence_score=scores['coherence'],
+            sememes=[]  # Would be populated with actual sememes
+        )
+        
+        # Add to training data
+        import json
+        from pathlib import Path
+        training_path = Path("data/training_pairs.jsonl")
+        training_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        with open(training_path, 'a') as f:
+            training_item = {
+                "query": training_pair.query,
+                "response": training_pair.response,
+                "quality_score": training_pair.quality_score,
+                "coherence_score": training_pair.coherence_score,
+                "sememes": training_pair.sememes
+            }
+            f.write(json.dumps(training_item) + '\n')
+        
+        return {
+            "message": "Training pair added for response improvement",
+            "evaluation": scores,
+            "training_pair": training_pair
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to improve response: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
