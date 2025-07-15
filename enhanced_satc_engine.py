@@ -307,7 +307,7 @@ class SememeDatabase:
                 sememe_id = f"{base_concept}_{i:03d}"
                 self.sememes[sememe_id] = {
                     'concept': base_concept,
-                    'embedding': np.random.randn(10000),
+                    'embedding': np.random.randn(784),  # Updated to square embedding dimension
                     'frequency': np.random.randint(1, 1000),
                     'semantic_field': base_concept
                 }
