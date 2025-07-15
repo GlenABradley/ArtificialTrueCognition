@@ -51,12 +51,16 @@ try:
     trainer = SATCTrainer(training_config)
     evaluator = ResponseQualityEvaluator()
     
+    # Initialize bulk training system
+    bulk_system = BulkTrainingSystem()
+    
     logger.info("Enhanced SATC Engine initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize SATC Engine: {str(e)}")
     satc_engine = None
     trainer = None
     evaluator = None
+    bulk_system = None
 
 # Define Models
 class StatusCheck(BaseModel):
