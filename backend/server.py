@@ -24,6 +24,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 # Import our Enhanced SATC Engine
 from enhanced_satc_engine import EnhancedSATCEngine, SATCConfig
+from satc_training_pipeline import SATCTrainer, TrainingConfig, ResponseQualityEvaluator
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
