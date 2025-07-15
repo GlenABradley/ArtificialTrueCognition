@@ -752,19 +752,12 @@ class EnhancedSATCEngine:
             # Keep only the top centers by value
             cluster_centers = sorted(cluster_centers, key=lambda x: x[2], reverse=True)[:max_nodes]
         
-        # Convert to node representations (expand to 128 dimensions)
+        # Convert to node representations with correct square dimension (1)
         nodes = []
         for center in cluster_centers:
-            # Create 128-dimensional node from center
-            node = np.zeros(128)
-            node[:min(len(center), 128)] = center[:128]
-            
-            # Fill remaining dimensions with structured noise
-            if len(center) < 128:
-                remaining = 128 - len(center)
-                node[len(center):] = np.random.randn(remaining) * 0.1
-            
-            nodes.append(node)
+            # Create 1-dimensional node from center value (final square dimension)
+            node_value = center[2] if len(center) > 2 else np.mean(center)  # Use the value component
+            nodes.append([node_value])  # Single dimension array
         
         return torch.tensor(nodes, dtype=torch.float32)
     
