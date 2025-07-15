@@ -204,6 +204,15 @@ async def get_cognition_history(limit: int = 10):
     """Get recent cognition processing history"""
     try:
         history = await db.cognition_responses.find().sort("timestamp", -1).limit(limit).to_list(length=limit)
+        
+        # Convert datetime objects to strings for JSON serialization
+        for item in history:
+            if 'timestamp' in item and hasattr(item['timestamp'], 'isoformat'):
+                item['timestamp'] = item['timestamp'].isoformat()
+            # Remove MongoDB ObjectId which can't be serialized
+            if '_id' in item:
+                del item['_id']
+        
         return history
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve history: {str(e)}")
