@@ -157,18 +157,37 @@ class SOMClustering:
         return heat_map
 
 class HDSpaceEncoder:
-    """Hyper-Dimensional Space Encoder"""
+    """Hyper-Dimensional Space Encoder with proper dimension handling"""
     
-    def __init__(self, hd_dim: int = 10000):
+    def __init__(self, hd_dim: int = 10000, input_dim: int = 128):
         self.hd_dim = hd_dim
-        self.encoder = nn.Linear(128, hd_dim)
-        self.decoder = nn.Linear(hd_dim, 128)
+        self.input_dim = input_dim
+        self.encoder = nn.Linear(input_dim, hd_dim)
+        self.decoder = nn.Linear(hd_dim, input_dim)
+        
+        # Initialize weights for better HD properties
+        nn.init.xavier_uniform_(self.encoder.weight)
+        nn.init.xavier_uniform_(self.decoder.weight)
         
     def encode(self, nodes: torch.Tensor) -> torch.Tensor:
         """Encode nodes to HD space"""
+        # Ensure input has correct dimensions
+        if nodes.dim() == 1:
+            nodes = nodes.unsqueeze(0)
+        
+        # Adjust input dimension if needed
+        if nodes.shape[-1] != self.input_dim:
+            if nodes.shape[-1] < self.input_dim:
+                # Pad with zeros
+                padding = torch.zeros(nodes.shape[:-1] + (self.input_dim - nodes.shape[-1],))
+                nodes = torch.cat([nodes, padding], dim=-1)
+            else:
+                # Truncate or compress
+                nodes = nodes[..., :self.input_dim]
+        
         hd_vectors = self.encoder(nodes)
         # Normalize for HD vector properties
-        hd_vectors = hd_vectors / torch.norm(hd_vectors, dim=1, keepdim=True)
+        hd_vectors = hd_vectors / torch.norm(hd_vectors, dim=-1, keepdim=True)
         return hd_vectors
     
     def decode(self, hd_vectors: torch.Tensor) -> torch.Tensor:
