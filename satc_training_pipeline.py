@@ -35,8 +35,8 @@ from sklearn.metrics import accuracy_score, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Import our SATC components
-from enhanced_satc_engine import EnhancedSATCEngine, SATCConfig
+# Import our Core SATC Engine (unified architecture)
+from core_satc_engine import EnhancedSATCEngine, CoreSATCConfig
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
