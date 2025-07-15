@@ -40,14 +40,31 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SATCConfig:
     """Configuration class for SATC Engine"""
-    # Core dimensions
+    # Core dimensions - Square progression architecture
     hd_dim: int = 10000
-    embedding_dim: int = 768  # Standard BERT embedding dimension
+    embedding_dim: int = 784  # 28² = 784 (close to 768 but perfect square)
+    
+    # Square progression for deep layers
+    layer_squares: List[int] = field(default_factory=lambda: [
+        784,   # 28² - Input embedding dimension  
+        625,   # 25² - First compression
+        484,   # 22² - Second compression  
+        361,   # 19² - Third compression
+        256,   # 16² - Fourth compression
+        169,   # 13² - Fifth compression
+        100,   # 10² - Sixth compression
+        64,    # 8² - Seventh compression
+        36,    # 6² - Eighth compression
+        16,    # 4² - Ninth compression
+        9,     # 3² - Tenth compression
+        4,     # 2² - Final compression
+        1      # 1² - Ultimate compression point
+    ])
     
     # Original attributes
     som_grid_size: int = 10
     deep_layers_config: Dict = field(default_factory=lambda: {
-        'layers': 5,
+        'layers': 12,  # Updated to match square progression
         'hidden_size': 512,
         'heads': 8,
         'dropout': 0.1
