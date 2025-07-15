@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 # Add the project root to the Python path
 sys.path.append(str(Path(__file__).parent.parent))
 
-# Import our Core SATC Engine (unified architecture)
-from core_satc_engine import EnhancedSATCEngine, CoreSATCConfig
+# Import our Enhanced SATC Engine (fixed version)
+from enhanced_satc_engine import EnhancedSATCEngine, SATCConfig
 from satc_training_pipeline import SATCTrainer, TrainingConfig, ResponseQualityEvaluator
 from bulk_training_system import BulkTrainingSystem, BulkTrainingConfig
 
@@ -44,7 +44,7 @@ api_router = APIRouter(prefix="/api")
 
 # Initialize Enhanced SATC Engine
 try:
-    satc_config = CoreSATCConfig()
+    satc_config = SATCConfig()
     satc_engine = EnhancedSATCEngine(satc_config)
     
     # Initialize training components
