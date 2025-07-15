@@ -48,7 +48,7 @@ class CoreSATCConfig:
     """Unified configuration for SATC engine"""
     # Core dimensions
     hd_dim: int = 10000
-    embedding_dim: int = 768
+    embedding_dim: int = 784  # Updated to square embedding dimension (28²)
     
     # Processing thresholds
     recognition_threshold: float = 0.7
