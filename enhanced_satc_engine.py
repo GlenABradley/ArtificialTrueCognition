@@ -427,10 +427,15 @@ class EnhancedSATCEngine:
     def __init__(self, config: Optional[SATCConfig] = None, sememe_db_path: Optional[str] = None):
         self.config = config or SATCConfig()
         
-        # Initialize core components
-        self.deep_layers = DeepLayers(self.config)
-        self.som_clustering = SOMClustering(self.config.som_grid_size)
-        self.hd_encoder = HDSpaceEncoder(self.config.hd_dim)
+        # Define consistent dimensions
+        self.embedding_dim = 768  # Standard BERT embedding dimension
+        self.structure_dim = 128  # Deep layers output dimension
+        self.hd_dim = self.config.hd_dim  # Hyper-dimensional space
+        
+        # Initialize core components with proper dimensions
+        self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)
+        self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)
+        self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)
         self.sememe_db = SememeDatabase(sememe_db_path)
         self.dissonance_balancer = DissonanceBalancer(self.config)
         
@@ -462,7 +467,7 @@ class EnhancedSATCEngine:
         # Training data for SOM
         self.som_training_data = []
         
-        logger.info("Enhanced SATC Engine initialized")
+        logger.info(f"Enhanced SATC Engine initialized with dimensions: embedding={self.embedding_dim}, structure={self.structure_dim}, HD={self.hd_dim}")
     
     def process_query(self, query: str) -> Dict[str, Any]:
         """
