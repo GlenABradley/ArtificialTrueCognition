@@ -834,13 +834,26 @@ class EnhancedSATCEngine:
         self.processor.load_state(path)
     
     def embed_query(self, query: str) -> np.ndarray:
-        """Embed query for external use"""
+        """Embed query for external use with consistent dimensions"""
         return self.processor.embedding_manager.embed_text(query)
     
     def deep_layers(self, embedding: np.ndarray) -> torch.Tensor:
-        """Process through deep layers"""
-        tensor = torch.from_numpy(embedding).float().to(self.processor.device)
-        return self.processor.cognition_net(tensor.unsqueeze(0))
+        """Process through deep layers with proper dimension handling"""
+        # Convert to tensor and ensure proper shape
+        if isinstance(embedding, np.ndarray):
+            tensor = torch.from_numpy(embedding).float()
+        else:
+            tensor = embedding.float()
+        
+        # Ensure tensor is on correct device
+        tensor = tensor.to(self.processor.device)
+        
+        # Add batch dimension if needed
+        if tensor.dim() == 1:
+            tensor = tensor.unsqueeze(0)
+        
+        # Use the cognition network (which expects embedding_dim input)
+        return self.processor.cognition_net(tensor)
     
     def memory_integration(self, input_embedding: np.ndarray, 
                           structure: torch.Tensor, nodes: List):
