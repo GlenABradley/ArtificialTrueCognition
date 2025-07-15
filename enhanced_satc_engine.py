@@ -482,6 +482,11 @@ class EnhancedSATCEngine:
     def __init__(self, config: Optional[SATCConfig] = None, sememe_db_path: Optional[str] = None):
         self.config = config or SATCConfig()
         
+        # Initialize real embedding model (replacing placeholder)
+        logger.info("Initializing real BERT embedding model...")
+        from sentence_transformers import SentenceTransformer
+        self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        
         # Define consistent square dimensions
         self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
         self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
