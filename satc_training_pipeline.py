@@ -208,7 +208,7 @@ class SATCTrainer:
         
         # Initialize components
         self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-        self.satc_engine = EnhancedSATCEngine()
+        self.satc_engine = EnhancedSATCEngine(CoreSATCConfig())
         
         # Training components
         self.optimizer = None
