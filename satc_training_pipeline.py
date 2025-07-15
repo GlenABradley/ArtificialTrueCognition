@@ -57,7 +57,7 @@ class TrainingConfig:
     
     # Model parameters
     max_sequence_length: int = 512
-    embedding_dim: int = 768
+    embedding_dim: int = 784  # Updated to square embedding dimension (28²)
     
     # Training strategies
     use_curriculum_learning: bool = True
