@@ -781,8 +781,11 @@ class EnhancedSATCEngine:
         
         perturbed = hd_nodes + noise
         
-        # Normalize to maintain HD vector properties
-        perturbed = perturbed / torch.norm(perturbed, dim=1, keepdim=True)
+        # Normalize to maintain HD vector properties - fix broadcasting issue
+        norms = torch.norm(perturbed, dim=1, keepdim=True)
+        # Avoid division by zero
+        norms = torch.clamp(norms, min=1e-8)
+        perturbed = perturbed / norms
         
         return perturbed
     
