@@ -5,6 +5,247 @@ import axios from "axios";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import axios from "axios";
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const TrainingInterface = () => {
+  const [trainingPairs, setTrainingPairs] = useState([]);
+  const [newPair, setNewPair] = useState({ query: "", response: "", quality_score: 0.8 });
+  const [isTraining, setIsTraining] = useState(false);
+  const [trainingConfig, setTrainingConfig] = useState({
+    epochs: 10,
+    batch_size: 16,
+    learning_rate: 0.0001
+  });
+
+  const loadTrainingData = async () => {
+    try {
+      const result = await axios.get(`${API}/training/data`);
+      setTrainingPairs(result.data.training_pairs || []);
+    } catch (err) {
+      console.error("Failed to load training data:", err);
+    }
+  };
+
+  const addTrainingPair = async () => {
+    if (!newPair.query.trim() || !newPair.response.trim()) return;
+    
+    try {
+      await axios.post(`${API}/training/add-pair`, {
+        query: newPair.query,
+        response: newPair.response,
+        quality_score: newPair.quality_score,
+        coherence_score: 0.8,
+        sememes: []
+      });
+      
+      setNewPair({ query: "", response: "", quality_score: 0.8 });
+      loadTrainingData();
+    } catch (err) {
+      console.error("Failed to add training pair:", err);
+    }
+  };
+
+  const startTraining = async () => {
+    if (trainingPairs.length === 0) {
+      alert("Please add some training pairs first!");
+      return;
+    }
+    
+    setIsTraining(true);
+    
+    try {
+      const response = await axios.post(`${API}/training/start`, {
+        training_pairs: trainingPairs,
+        epochs: trainingConfig.epochs,
+        batch_size: trainingConfig.batch_size,
+        learning_rate: trainingConfig.learning_rate
+      });
+      
+      alert(response.data.message);
+    } catch (err) {
+      console.error("Failed to start training:", err);
+      alert("Training failed to start");
+    } finally {
+      setIsTraining(false);
+    }
+  };
+
+  const clearTrainingData = async () => {
+    if (confirm("Are you sure you want to clear all training data?")) {
+      try {
+        await axios.delete(`${API}/training/data`);
+        loadTrainingData();
+      } catch (err) {
+        console.error("Failed to clear training data:", err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    loadTrainingData();
+  }, []);
+
+  return (
+    <div className="training-interface">
+      <h2>🎓 Training Interface</h2>
+      
+      {/* Training Configuration */}
+      <div className="training-config">
+        <h3>Training Configuration</h3>
+        <div className="config-grid">
+          <div className="config-item">
+            <label>Epochs:</label>
+            <input
+              type="number"
+              value={trainingConfig.epochs}
+              onChange={(e) => setTrainingConfig({...trainingConfig, epochs: parseInt(e.target.value)})}
+              min="1"
+              max="100"
+            />
+          </div>
+          <div className="config-item">
+            <label>Batch Size:</label>
+            <input
+              type="number"
+              value={trainingConfig.batch_size}
+              onChange={(e) => setTrainingConfig({...trainingConfig, batch_size: parseInt(e.target.value)})}
+              min="1"
+              max="64"
+            />
+          </div>
+          <div className="config-item">
+            <label>Learning Rate:</label>
+            <input
+              type="number"
+              value={trainingConfig.learning_rate}
+              onChange={(e) => setTrainingConfig({...trainingConfig, learning_rate: parseFloat(e.target.value)})}
+              step="0.0001"
+              min="0.0001"
+              max="0.01"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Add Training Pair */}
+      <div className="add-training-pair">
+        <h3>Add Training Pair</h3>
+        <div className="pair-form">
+          <textarea
+            placeholder="Enter query..."
+            value={newPair.query}
+            onChange={(e) => setNewPair({...newPair, query: e.target.value})}
+            rows={2}
+          />
+          <textarea
+            placeholder="Enter expected response..."
+            value={newPair.response}
+            onChange={(e) => setNewPair({...newPair, response: e.target.value})}
+            rows={3}
+          />
+          <div className="quality-score">
+            <label>Quality Score:</label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={newPair.quality_score}
+              onChange={(e) => setNewPair({...newPair, quality_score: parseFloat(e.target.value)})}
+            />
+            <span>{newPair.quality_score.toFixed(1)}</span>
+          </div>
+          <button onClick={addTrainingPair} className="add-pair-btn">
+            Add Training Pair
+          </button>
+        </div>
+      </div>
+
+      {/* Training Data */}
+      <div className="training-data">
+        <div className="data-header">
+          <h3>Training Data ({trainingPairs.length} pairs)</h3>
+          <div className="data-actions">
+            <button onClick={startTraining} disabled={isTraining || trainingPairs.length === 0} className="train-btn">
+              {isTraining ? "Training..." : "Start Training"}
+            </button>
+            <button onClick={clearTrainingData} className="clear-btn">
+              Clear Data
+            </button>
+          </div>
+        </div>
+        
+        <div className="training-pairs-list">
+          {trainingPairs.map((pair, index) => (
+            <div key={index} className="training-pair">
+              <div className="pair-query">
+                <strong>Q:</strong> {pair.query}
+              </div>
+              <div className="pair-response">
+                <strong>A:</strong> {pair.response}
+              </div>
+              <div className="pair-scores">
+                <span>Quality: {pair.quality_score.toFixed(1)}</span>
+                <span>Coherence: {pair.coherence_score.toFixed(1)}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ResponseImprovement = ({ query, currentResponse, onImprove }) => {
+  const [improvedResponse, setImprovedResponse] = useState("");
+  const [isImproving, setIsImproving] = useState(false);
+
+  const improveResponse = async () => {
+    if (!improvedResponse.trim()) return;
+    
+    setIsImproving(true);
+    
+    try {
+      const response = await axios.post(`${API}/training/improve-response`, null, {
+        params: {
+          query: query,
+          current_response: currentResponse,
+          target_response: improvedResponse
+        }
+      });
+      
+      onImprove(response.data);
+      setImprovedResponse("");
+    } catch (err) {
+      console.error("Failed to improve response:", err);
+    } finally {
+      setIsImproving(false);
+    }
+  };
+
+  return (
+    <div className="response-improvement">
+      <h4>💡 Improve This Response</h4>
+      <div className="improvement-form">
+        <textarea
+          placeholder="Enter improved response..."
+          value={improvedResponse}
+          onChange={(e) => setImprovedResponse(e.target.value)}
+          rows={3}
+        />
+        <button onClick={improveResponse} disabled={isImproving} className="improve-btn">
+          {isImproving ? "Adding..." : "Add as Training"}
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const CognitionInterface = () => {
   const [query, setQuery] = useState("");
   const [response, setResponse] = useState(null);
@@ -12,6 +253,8 @@ const CognitionInterface = () => {
   const [history, setHistory] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [error, setError] = useState(null);
+  const [showTraining, setShowTraining] = useState(false);
+  const [showImprovement, setShowImprovement] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -72,6 +315,11 @@ const CognitionInterface = () => {
     }
   };
 
+  const handleResponseImprovement = (improvementData) => {
+    alert("Response improvement added to training data!");
+    setShowImprovement(false);
+  };
+
   const formatTime = (seconds) => {
     return `${(seconds * 1000).toFixed(1)}ms`;
   };
@@ -85,7 +333,18 @@ const CognitionInterface = () => {
       <div className="header">
         <h1>🧠 Enhanced SATC Engine</h1>
         <p className="subtitle">Artificial True Cognition System</p>
+        <div className="header-actions">
+          <button 
+            onClick={() => setShowTraining(!showTraining)}
+            className="training-toggle-btn"
+          >
+            {showTraining ? "Hide Training" : "Show Training"}
+          </button>
+        </div>
       </div>
+
+      {/* Training Interface */}
+      {showTraining && <TrainingInterface />}
 
       {/* Query Input */}
       <div className="query-section">
@@ -132,6 +391,12 @@ const CognitionInterface = () => {
               </span>
               <span className="method-badge">{response.method}</span>
               <span className="time-badge">{formatTime(response.processing_time)}</span>
+              <button 
+                onClick={() => setShowImprovement(!showImprovement)}
+                className="improve-toggle-btn"
+              >
+                💡 Improve
+              </button>
             </div>
             
             <div className="response-content">
@@ -179,6 +444,15 @@ const CognitionInterface = () => {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Response Improvement */}
+            {showImprovement && (
+              <ResponseImprovement 
+                query={response.query}
+                currentResponse={response.output}
+                onImprove={handleResponseImprovement}
+              />
             )}
           </div>
         </div>
