@@ -1065,6 +1065,65 @@ class EnhancedSATCEngine:
         
         return f"Structured response involving {', '.join(output_parts)} with coherence {np.mean(structure_values):.3f}"
     
+    def brain_wiggle_resonance(self, structure: torch.Tensor, sememes: List[Dict]) -> torch.Tensor:
+        """Real brain wiggle resonance using tensor operations"""
+        try:
+            # Convert structure to appropriate tensor format
+            if structure.dim() == 0:
+                structure = structure.unsqueeze(0)
+            
+            # Create sememe tensor matrix
+            sememe_embeddings = []
+            for sememe in sememes:
+                # Get embedding from sememe data
+                if 'embedding' in sememe:
+                    embedding = sememe['embedding']
+                    if isinstance(embedding, np.ndarray):
+                        embedding = torch.tensor(embedding, dtype=torch.float32)
+                    sememe_embeddings.append(embedding)
+            
+            if not sememe_embeddings:
+                # No sememes available, return structure as-is
+                return structure
+            
+            # Stack sememe embeddings into matrix
+            sememe_matrix = torch.stack(sememe_embeddings[:min(len(sememe_embeddings), 10)])  # Limit to 10 for performance
+            
+            # Compute resonance through tensor operations
+            # 1. Expand structure to match sememe dimensions
+            if structure.shape[0] != sememe_matrix.shape[1]:
+                # Project structure to sememe embedding dimension
+                projection_layer = torch.nn.Linear(structure.shape[0], sememe_matrix.shape[1])
+                structure_projected = projection_layer(structure)
+            else:
+                structure_projected = structure
+            
+            # 2. Compute similarity (resonance) with all sememes
+            similarities = torch.cosine_similarity(
+                structure_projected.unsqueeze(0).expand(sememe_matrix.shape[0], -1),
+                sememe_matrix,
+                dim=1
+            )
+            
+            # 3. Weight sememes by resonance strength
+            weights = torch.softmax(similarities, dim=0)
+            
+            # 4. Compute weighted semantic resonance
+            resonance = torch.sum(weights.unsqueeze(1) * sememe_matrix, dim=0)
+            
+            # 5. Combine with original structure (brain wiggle effect)
+            alpha = 0.7  # Resonance strength
+            wiggled_output = alpha * resonance + (1 - alpha) * structure_projected
+            
+            # 6. Apply non-linear activation for cognitive enhancement
+            wiggled_output = torch.tanh(wiggled_output)
+            
+            return wiggled_output
+            
+        except Exception as e:
+            logger.error(f"Error in brain wiggle resonance: {str(e)}")
+            # Fallback to simple processing
+            return torch.tanh(structure) if structure.numel() > 0 else structure
     def get_performance_report(self) -> Dict[str, Any]:
         """Get comprehensive performance report"""
         metrics = self.performance_metrics
