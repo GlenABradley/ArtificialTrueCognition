@@ -209,7 +209,7 @@ yarn start
 
 ### Running the Enhanced SATC Engine
 ```python
-# Simple usage
+# Simple usage (real implementation)
 from enhanced_satc_engine import EnhancedSATCEngine
 
 engine = EnhancedSATCEngine()
@@ -219,7 +219,16 @@ print(f"Success: {result['success']}")
 print(f"Phase used: {result['phase']}")
 print(f"Coherence: {result['coherence']}")
 print(f"Processing time: {result['processing_time']}")
+
+# Note: Now uses real BERT embeddings and semantic processing
 ```
+
+### Current Implementation Notes
+- **BERT Embeddings**: Uses sentence-transformers 'all-MiniLM-L6-v2' model
+- **Semantic Processing**: Real sememe database with 140+ concepts
+- **Brain Wiggle**: Tensor-based resonance using cosine similarity
+- **Square Architecture**: All 13 layers working with perfect progression
+- **Training**: Basic structure exists, optimization in progress
 
 ## 🌐 API Endpoints
 
