@@ -290,6 +290,7 @@ class AutomatedTrainingPipeline:
         # Initialize SATC system
         satc_config = SATCConfig()
         satc_config.hd_dim = 10000  # Full HD dimension
+        satc_config.embedding_dim = 784  # Square embedding dimension
         
         training_config = TrainingConfig()
         training_config.training_data_path = training_data_path
