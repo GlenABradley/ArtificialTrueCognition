@@ -482,12 +482,12 @@ class EnhancedSATCEngine:
     def __init__(self, config: Optional[SATCConfig] = None, sememe_db_path: Optional[str] = None):
         self.config = config or SATCConfig()
         
-        # Define consistent dimensions
-        self.embedding_dim = 768  # Standard BERT embedding dimension
-        self.structure_dim = 128  # Deep layers output dimension
+        # Define consistent square dimensions
+        self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
+        self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
         self.hd_dim = self.config.hd_dim  # Hyper-dimensional space
         
-        # Initialize core components with proper dimensions
+        # Initialize core components with square dimensions
         self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)
         self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)
         self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)
