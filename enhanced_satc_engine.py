@@ -228,9 +228,9 @@ class SOMClustering:
         return heat_map
 
 class HDSpaceEncoder:
-    """Hyper-Dimensional Space Encoder with proper dimension handling"""
+    """Hyper-Dimensional Space Encoder with square input dimension"""
     
-    def __init__(self, hd_dim: int = 10000, input_dim: int = 128):
+    def __init__(self, hd_dim: int = 10000, input_dim: int = 1):  # Updated to match final square (1²)
         self.hd_dim = hd_dim
         self.input_dim = input_dim
         self.encoder = nn.Linear(input_dim, hd_dim)
