@@ -1,9 +1,2 @@
-{"query": "Hello", "response": "Hello", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "Who are you?", "response": "I am a novel cognitive model demonstrating Artificial True Cognition", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "how is the world today?", "response": "I don't know, I would like to see the world.", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "Hello", "response": "Hello, It is a pleasure to meet you.", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "Hello", "response": "Hello! It is a pleasure to chat with you", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "hello", "response": "hello", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
-{"query": "Hello", "response": "Hello", "quality_score": 1.0, "coherence_score": 0.8, "sememes": []}
-{"query": "Hello.", "response": "Hello!", "quality_score": 1.0, "coherence_score": 0.8, "sememes": []}
-{"query": "Hello", "response": "Hello", "quality_score": 0.85, "coherence_score": 0.8, "sememes": []}
+{"query": "What is deep learning?", "response": "Deep learning is a subset of machine learning that uses neural networks with multiple layers to model and understand complex patterns in data.", "quality_score": 0.9, "coherence_score": 0.88, "sememes": ["deep", "learning", "neural", "networks"]}
+{"query": "What is consciousness?", "response": "Consciousness is the state of being aware of and able to think about one's existence, sensations, thoughts, and surroundings.", "quality_score": 0.7333333333333334, "coherence_score": 0.8, "sememes": []}
