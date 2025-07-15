@@ -300,11 +300,22 @@ async def get_sememes_for_query(query: str):
         hd_nodes = satc_engine.hd_encoder.encode(nodes)
         
         # Get sememes
-        sememes = satc_engine.sememe_population(hd_nodes)
+        sememes_raw = satc_engine.sememe_population(hd_nodes)
+        
+        # Clean up sememes for JSON serialization
+        sememes_clean = []
+        for sememe in sememes_raw:
+            clean_sememe = {
+                'node_index': sememe['node_index'],
+                'primary_sememe': sememe['primary_sememe']['data']['concept'] if sememe['primary_sememe'] else None,
+                'alternative_sememes': [alt['data']['concept'] if alt and 'data' in alt else str(alt) for alt in sememe['alternative_sememes']] if sememe['alternative_sememes'] else [],
+                'node_vector_length': len(sememe['node_vector']) if sememe['node_vector'] is not None else 0
+            }
+            sememes_clean.append(clean_sememe)
         
         return {
             "query": query,
-            "sememes": sememes,
+            "sememes": sememes_clean,
             "nodes_count": len(nodes),
             "structure_mean": float(torch.mean(structure))
         }
