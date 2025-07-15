@@ -204,8 +204,8 @@ class DatabaseManager:
         # In production, this would use real embeddings from BERT/Word2Vec
         # For now, generate structured embeddings based on concept and field
         
-        # Create base embedding
-        embedding = np.random.randn(self.config.hd_dim).astype(np.float32)
+        # Use embedding_dim instead of hd_dim to match query embeddings
+        embedding = np.random.randn(self.config.embedding_dim).astype(np.float32)
         
         # Add semantic field structure
         field_seeds = {
@@ -220,7 +220,7 @@ class DatabaseManager:
         
         seed = field_seeds.get(semantic_field, 0.8)
         np.random.seed(int(abs(hash(concept + semantic_field)) % 1000000))
-        field_vector = np.random.randn(self.config.hd_dim).astype(np.float32)
+        field_vector = np.random.randn(self.config.embedding_dim).astype(np.float32)
         
         # Combine concept and field vectors
         embedding = 0.7 * embedding + 0.3 * field_vector
