@@ -76,21 +76,23 @@ class SATCConfig:
     })
 
 class DeepLayers(nn.Module):
-    """Deep Layers MLP for structure inference"""
+    """Deep layers for structure inference with configurable input dimension"""
     
-    def __init__(self, config: SATCConfig):
+    def __init__(self, config: SATCConfig, input_dim: int = 768):
         super().__init__()
-        
         self.config = config
-        layers_config = config.deep_layers_config
+        self.input_dim = input_dim
         
-        # Build 5-layer MLP
+        layers_config = config.deep_layers_config
+        hidden_size = layers_config['hidden_size']
+        
+        # Build layers with proper input dimension
         self.layers = nn.ModuleList([
-            nn.Linear(768, layers_config['hidden_size']),  # BERT input
-            nn.Linear(layers_config['hidden_size'], layers_config['hidden_size']),
-            nn.Linear(layers_config['hidden_size'], layers_config['hidden_size']),
-            nn.Linear(layers_config['hidden_size'], layers_config['hidden_size']),
-            nn.Linear(layers_config['hidden_size'], 128)  # Output for clustering
+            nn.Linear(input_dim, hidden_size),
+            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(hidden_size, hidden_size),
+            nn.Linear(hidden_size, 128)  # Output size for compatibility
         ])
         
         self.activations = nn.ModuleList([
@@ -102,15 +104,29 @@ class DeepLayers(nn.Module):
         ])
         
         self.dropout = nn.Dropout(layers_config['dropout'])
-        self.layer_norm = nn.LayerNorm(layers_config['hidden_size'])
+        self.layer_norm = nn.LayerNorm(hidden_size)
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through deep layers"""
+        # Ensure proper input dimension
+        if x.dim() == 1:
+            x = x.unsqueeze(0)
+        
+        if x.shape[-1] != self.input_dim:
+            if x.shape[-1] < self.input_dim:
+                # Pad with zeros
+                padding = torch.zeros(x.shape[:-1] + (self.input_dim - x.shape[-1],))
+                x = torch.cat([x, padding], dim=-1)
+            else:
+                # Truncate
+                x = x[..., :self.input_dim]
+        
         for i, (layer, activation) in enumerate(zip(self.layers, self.activations)):
             x = layer(x)
             if i < len(self.layers) - 1:  # No dropout on final layer
                 x = self.dropout(x)
-                x = self.layer_norm(x)
+                if x.shape[-1] == self.layer_norm.normalized_shape[0]:  # Check if dimensions match
+                    x = self.layer_norm(x)
             x = activation(x)
         
         return x
