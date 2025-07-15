@@ -476,18 +476,18 @@ class EnhancedSATCEngine:
             }
     
     def embed_query(self, query: str) -> torch.Tensor:
-        """Embed query using BERT-like embedding (simplified)"""
+        """Embed query using BERT-like embedding (simplified) with proper dimensionality"""
         # In real implementation, use actual BERT/RoBERTa
         # For now, create a deterministic embedding based on query
         
         # Simple hash-based embedding
         query_hash = hash(query) % 1000000
-        embedding = torch.randn(768, generator=torch.Generator().manual_seed(query_hash))
+        embedding = torch.randn(self.config.embedding_dim, generator=torch.Generator().manual_seed(query_hash))
         
         # Add some semantic structure
         words = query.lower().split()
         for i, word in enumerate(words[:10]):  # Limit to 10 words
-            word_hash = hash(word) % 768
+            word_hash = hash(word) % self.config.embedding_dim
             embedding[word_hash] += 0.1 * (i + 1)
         
         return embedding.requires_grad_(True)
