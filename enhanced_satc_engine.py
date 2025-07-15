@@ -132,7 +132,7 @@ class DeepLayers(nn.Module):
         return x
 
 class SOMClustering:
-    """Self-Organizing Map for heat map clustering"""
+    """Self-Organizing Map for heat map clustering with configurable input dimension"""
     
     def __init__(self, grid_size: int = 10, input_dim: int = 128):
         self.grid_size = grid_size
@@ -143,6 +143,20 @@ class SOMClustering:
         
     def train(self, data: np.ndarray, epochs: int = 100):
         """Train SOM with Kohonen algorithm"""
+        # Ensure data has correct dimensions
+        if data.ndim == 1:
+            data = data.reshape(1, -1)
+        
+        # Adjust data dimension if needed
+        if data.shape[-1] != self.input_dim:
+            if data.shape[-1] < self.input_dim:
+                # Pad with zeros
+                padding = np.zeros((data.shape[0], self.input_dim - data.shape[-1]))
+                data = np.concatenate([data, padding], axis=-1)
+            else:
+                # Truncate
+                data = data[..., :self.input_dim]
+        
         for epoch in range(epochs):
             # Decay learning rate and neighborhood radius
             current_lr = self.learning_rate * (1 - epoch / epochs)
@@ -163,6 +177,20 @@ class SOMClustering:
     
     def project(self, data: np.ndarray) -> np.ndarray:
         """Project data onto SOM heat map"""
+        # Ensure data has correct dimensions
+        if data.ndim == 1:
+            data = data.reshape(-1)
+        
+        # Adjust data dimension if needed
+        if data.shape[-1] != self.input_dim:
+            if data.shape[-1] < self.input_dim:
+                # Pad with zeros
+                padding = np.zeros(self.input_dim - data.shape[-1])
+                data = np.concatenate([data, padding])
+            else:
+                # Truncate
+                data = data[:self.input_dim]
+        
         heat_map = np.zeros((self.grid_size, self.grid_size))
         
         for i in range(self.grid_size):
