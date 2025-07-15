@@ -44,10 +44,18 @@ api_router = APIRouter(prefix="/api")
 try:
     satc_config = SATCConfig()
     satc_engine = EnhancedSATCEngine(satc_config)
+    
+    # Initialize training components
+    training_config = TrainingConfig()
+    trainer = SATCTrainer(training_config)
+    evaluator = ResponseQualityEvaluator()
+    
     logger.info("Enhanced SATC Engine initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize SATC Engine: {str(e)}")
     satc_engine = None
+    trainer = None
+    evaluator = None
 
 # Define Models
 class StatusCheck(BaseModel):
