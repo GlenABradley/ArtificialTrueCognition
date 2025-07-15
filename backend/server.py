@@ -98,6 +98,36 @@ class PerformanceMetrics(BaseModel):
     som_training_samples: int
     sememe_database_size: int
 
+class TrainingPair(BaseModel):
+    query: str
+    response: str
+    quality_score: float = 0.8
+    coherence_score: float = 0.8
+    sememes: List[str] = []
+
+class TrainingRequest(BaseModel):
+    training_pairs: List[TrainingPair]
+    epochs: int = 10
+    batch_size: int = 16
+    learning_rate: float = 1e-4
+
+class TrainingStatus(BaseModel):
+    is_training: bool
+    current_epoch: int = 0
+    total_epochs: int = 0
+    current_loss: float = 0.0
+    current_coherence: float = 0.0
+    estimated_time_remaining: float = 0.0
+
+class ResponseEvaluation(BaseModel):
+    query: str
+    response: str
+    coherence: float
+    relevance: float
+    informativeness: float
+    fluency: float
+    overall: float
+
 # Original routes
 @api_router.get("/")
 async def root():
