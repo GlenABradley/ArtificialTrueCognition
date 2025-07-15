@@ -4,3 +4,4 @@
 {"query": "Test query for training", "response": "Test response for training system validation", "quality_score": 0.8, "coherence_score": 0.75, "sememes": ["test", "training", "validation"]}
 {"query": "hello", "response": "hello", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
 {"query": "What is the square dimension architecture?", "response": "The square dimension architecture uses perfect squares for layer dimensions, progressing from 784 (28\u00b2) down to 1 (1\u00b2) through the deep layers.", "quality_score": 0.9, "coherence_score": 0.85, "sememes": ["architecture", "dimensions", "squares"]}
+{"query": "What is the square dimension architecture?", "response": "The square dimension architecture uses perfect squares for layer dimensions, progressing from 784 (28\u00b2) down to 1 (1\u00b2) through the deep layers.", "quality_score": 0.9, "coherence_score": 0.85, "sememes": ["architecture", "dimensions", "squares"]}
