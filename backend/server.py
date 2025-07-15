@@ -133,6 +133,19 @@ class ResponseEvaluation(BaseModel):
     fluency: float
     overall: float
 
+class BulkTrainingUpload(BaseModel):
+    format: str = "json"  # json, csv, auto
+    data: str  # Raw data content
+    
+class AutomatedTrainingRequest(BaseModel):
+    hours_per_day: int = 20
+    rest_hours: int = 4
+    max_epochs: int = 1000
+    save_every_n_epochs: int = 10
+
+class HelloWorldRequest(BaseModel):
+    quick_start: bool = True
+
 # Original routes
 @api_router.get("/")
 async def root():
