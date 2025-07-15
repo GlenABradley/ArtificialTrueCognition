@@ -379,15 +379,36 @@ async def get_training_status():
         raise HTTPException(status_code=500, detail="Training system not initialized")
     
     try:
-        # For now, return mock status
-        # In production, this would track actual training progress
+        # Get actual training status from system
+        training_active = getattr(trainer, 'training_active', False)
+        current_epoch = getattr(trainer, 'current_epoch', 0)
+        total_epochs = getattr(trainer, 'total_epochs', 0)
+        
+        # Get loss from metrics if available
+        current_loss = 0.0
+        current_coherence = 0.0
+        
+        if hasattr(trainer, 'training_metrics'):
+            metrics = trainer.training_metrics
+            if metrics.get('loss'):
+                current_loss = metrics['loss'][-1]
+            if metrics.get('coherence_scores'):
+                current_coherence = metrics['coherence_scores'][-1]
+        
+        # Calculate estimated time remaining
+        estimated_time = 0.0
+        if training_active and current_epoch > 0:
+            avg_epoch_time = np.mean(trainer.training_metrics.get('epoch_times', [60]))
+            remaining_epochs = total_epochs - current_epoch
+            estimated_time = avg_epoch_time * remaining_epochs
+        
         return TrainingStatus(
-            is_training=False,
-            current_epoch=0,
-            total_epochs=0,
-            current_loss=0.0,
-            current_coherence=0.0,
-            estimated_time_remaining=0.0
+            is_training=training_active,
+            current_epoch=current_epoch,
+            total_epochs=total_epochs,
+            current_loss=current_loss,
+            current_coherence=current_coherence,
+            estimated_time_remaining=estimated_time
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get training status: {str(e)}")
