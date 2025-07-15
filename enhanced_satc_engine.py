@@ -97,42 +97,46 @@ class SATCConfig:
     })
 
 class DeepLayers(nn.Module):
-    """Deep layers for structure inference with configurable input dimension"""
+    """Deep layers for structure inference with square progression architecture"""
     
-    def __init__(self, config: SATCConfig, input_dim: int = 768):
+    def __init__(self, config: SATCConfig, input_dim: int = 784):
         super().__init__()
         self.config = config
         self.input_dim = input_dim
         
-        layers_config = config.deep_layers_config
-        hidden_size = layers_config['hidden_size']
+        # Use square progression from config
+        layer_dims = config.layer_squares
         
-        # Build layers with proper input dimension
-        self.layers = nn.ModuleList([
-            nn.Linear(input_dim, hidden_size),
-            nn.Linear(hidden_size, hidden_size),
-            nn.Linear(hidden_size, hidden_size),
-            nn.Linear(hidden_size, hidden_size),
-            nn.Linear(hidden_size, 128)  # Output size for compatibility
-        ])
+        # Build layers with square progression
+        self.layers = nn.ModuleList()
         
+        # First layer: input_dim -> first square
+        self.layers.append(nn.Linear(input_dim, layer_dims[0]))
+        
+        # Intermediate layers: square progression
+        for i in range(len(layer_dims) - 1):
+            self.layers.append(nn.Linear(layer_dims[i], layer_dims[i + 1]))
+        
+        # Activations for each layer
         self.activations = nn.ModuleList([
-            nn.ReLU(),
-            nn.ReLU(), 
-            nn.ReLU(),
-            nn.ReLU(),
-            nn.Tanh()
+            nn.ReLU() if i < len(layer_dims) - 1 else nn.Tanh() 
+            for i in range(len(layer_dims))
         ])
         
-        self.dropout = nn.Dropout(layers_config['dropout'])
-        self.layer_norm = nn.LayerNorm(hidden_size)
+        self.dropout = nn.Dropout(config.deep_layers_config['dropout'])
+        
+        # Layer normalization for each square dimension
+        self.layer_norms = nn.ModuleList([
+            nn.LayerNorm(dim) for dim in layer_dims
+        ])
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through deep layers"""
+        """Forward pass through square progression layers"""
         # Ensure proper input dimension
         if x.dim() == 1:
             x = x.unsqueeze(0)
         
+        # Handle input dimension mismatch
         if x.shape[-1] != self.input_dim:
             if x.shape[-1] < self.input_dim:
                 # Pad with zeros
@@ -142,12 +146,14 @@ class DeepLayers(nn.Module):
                 # Truncate
                 x = x[..., :self.input_dim]
         
-        for i, (layer, activation) in enumerate(zip(self.layers, self.activations)):
+        # Forward pass through square progression
+        for i, (layer, activation, norm) in enumerate(zip(self.layers, self.activations, self.layer_norms)):
             x = layer(x)
+            x = norm(x)  # Apply layer normalization
+            
             if i < len(self.layers) - 1:  # No dropout on final layer
                 x = self.dropout(x)
-                if x.shape[-1] == self.layer_norm.normalized_shape[0]:  # Check if dimensions match
-                    x = self.layer_norm(x)
+            
             x = activation(x)
         
         return x
