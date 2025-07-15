@@ -7,38 +7,37 @@ const config = {
 };
 
 module.exports = {
-  webpack: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
+  style: {
+    postcss: {
+      plugins: [
+        require('tailwindcss'),
+        require('autoprefixer'),
+      ],
     },
+  },
+  webpack: {
     configure: (webpackConfig) => {
+      // Fix file watching limits
+      webpackConfig.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: /node_modules/,
+      };
       
-      // Disable hot reload completely if environment variable is set
-      if (config.disableHotReload) {
-        // Remove hot reload related plugins
-        webpackConfig.plugins = webpackConfig.plugins.filter(plugin => {
-          return !(plugin.constructor.name === 'HotModuleReplacementPlugin');
-        });
-        
-        // Disable watch mode
-        webpackConfig.watch = false;
-        webpackConfig.watchOptions = {
-          ignored: /.*/, // Ignore all files
-        };
-      } else {
-        // Add ignored patterns to reduce watched directories
-        webpackConfig.watchOptions = {
-          ...webpackConfig.watchOptions,
-          ignored: [
-            '**/node_modules/**',
-            '**/.git/**',
-            '**/build/**',
-            '**/dist/**',
-            '**/coverage/**',
-            '**/public/**',
-          ],
-        };
-      }
+      // Reduce memory usage
+      webpackConfig.optimization = {
+        ...webpackConfig.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+          },
+        },
+      };
       
       return webpackConfig;
     },
