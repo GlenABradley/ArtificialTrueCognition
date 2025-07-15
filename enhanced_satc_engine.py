@@ -39,8 +39,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SATCConfig:
-    """Configuration for SATC Engine"""
+    """Configuration class for SATC Engine"""
+    # Core dimensions
     hd_dim: int = 10000
+    embedding_dim: int = 768  # Standard BERT embedding dimension
+    
+    # Original attributes
     som_grid_size: int = 10
     deep_layers_config: Dict = field(default_factory=lambda: {
         'layers': 5,
