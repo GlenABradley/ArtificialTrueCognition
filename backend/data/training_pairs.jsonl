@@ -2,3 +2,4 @@
 {"query": "How do neural networks work?", "response": "Neural networks work by processing information through interconnected nodes (neurons) that apply weights and activation functions to transform input data into meaningful outputs.", "quality_score": 0.85, "coherence_score": 0.82, "sememes": ["neural", "networks", "neurons", "weights", "activation"]}
 {"query": "Test query for training", "response": "Test response for training system validation", "quality_score": 0.8, "coherence_score": 0.75, "sememes": ["test", "training", "validation"]}
 {"query": "Test query for training", "response": "Test response for training system validation", "quality_score": 0.8, "coherence_score": 0.75, "sememes": ["test", "training", "validation"]}
+{"query": "hello", "response": "hello", "quality_score": 0.8, "coherence_score": 0.8, "sememes": []}
