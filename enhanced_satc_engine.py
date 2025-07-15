@@ -576,21 +576,35 @@ class EnhancedSATCEngine:
             }
     
     def embed_query(self, query: str) -> torch.Tensor:
-        """Embed query using BERT-like embedding (simplified) with proper dimensionality"""
-        # In real implementation, use actual BERT/RoBERTa
-        # For now, create a deterministic embedding based on query
-        
-        # Simple hash-based embedding
-        query_hash = hash(query) % 1000000
-        embedding = torch.randn(self.config.embedding_dim, generator=torch.Generator().manual_seed(query_hash))
-        
-        # Add some semantic structure
-        words = query.lower().split()
-        for i, word in enumerate(words[:10]):  # Limit to 10 words
-            word_hash = hash(word) % self.config.embedding_dim
-            embedding[word_hash] += 0.1 * (i + 1)
-        
-        return embedding.requires_grad_(True)
+        """Embed query using real BERT embeddings with proper dimensionality"""
+        try:
+            # Use sentence-transformers for real semantic embeddings
+            embedding = self.embedding_model.encode(query, convert_to_tensor=True)
+            
+            # The model outputs 384-dimensional vectors, we need to project to 784
+            if embedding.shape[0] != self.embedding_dim:
+                # Create a linear projection layer if not exists
+                if not hasattr(self, 'embedding_projection'):
+                    self.embedding_projection = torch.nn.Linear(384, self.embedding_dim)
+                
+                # Project to square dimension
+                embedding = self.embedding_projection(embedding)
+            
+            return embedding.requires_grad_(True)
+            
+        except Exception as e:
+            logger.error(f"Error in real embedding: {str(e)}, falling back to deterministic")
+            # Fallback to deterministic embedding if real model fails
+            query_hash = hash(query) % 1000000
+            embedding = torch.randn(self.config.embedding_dim, generator=torch.Generator().manual_seed(query_hash))
+            
+            # Add semantic structure
+            words = query.lower().split()
+            for i, word in enumerate(words[:10]):
+                word_hash = hash(word) % self.config.embedding_dim
+                embedding[word_hash] += 0.1 * (i + 1)
+            
+            return embedding.requires_grad_(True)
     
     def recognition_check(self, intent_vector: torch.Tensor) -> bool:
         """Check if query matches deposited patterns"""
