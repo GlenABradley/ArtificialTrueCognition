@@ -278,15 +278,17 @@ class SememeDatabase:
     """HowNet/WordNet Sememe Database Integration"""
     
     def __init__(self, db_path: Optional[str] = None):
-        self.db_path = db_path
+        """Initialize sememe database"""
         self.sememes = {}
-        self.embeddings = None
         self.index = None
+        self.embeddings = None
+        self.sememe_ids = []
+        self.embedding_dim = 784  # Square embedding dimension
         
         if db_path and Path(db_path).exists():
             self.load_database(db_path)
         else:
-            self.create_mock_database()
+            self.create_real_sememe_database()
     
     def create_real_sememe_database(self):
         """Create real sememe database with proper semantic embeddings"""
