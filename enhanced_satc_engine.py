@@ -159,9 +159,9 @@ class DeepLayers(nn.Module):
         return x
 
 class SOMClustering:
-    """Self-Organizing Map for heat map clustering with configurable input dimension"""
+    """Self-Organizing Map for heat map clustering with square input dimension"""
     
-    def __init__(self, grid_size: int = 10, input_dim: int = 128):
+    def __init__(self, grid_size: int = 10, input_dim: int = 1):  # Updated to match final square (1²)
         self.grid_size = grid_size
         self.input_dim = input_dim
         self.weights = np.random.randn(grid_size, grid_size, input_dim)
