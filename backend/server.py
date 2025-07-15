@@ -306,11 +306,26 @@ async def get_sememes_for_query(query: str):
         # Clean up sememes for JSON serialization
         sememes_clean = []
         for sememe in sememes_raw:
+            # Handle primary sememe
+            primary_concept = None
+            if sememe.get('primary_sememe') and isinstance(sememe['primary_sememe'], dict):
+                if 'data' in sememe['primary_sememe'] and 'concept' in sememe['primary_sememe']['data']:
+                    primary_concept = sememe['primary_sememe']['data']['concept']
+            
+            # Handle alternative sememes
+            alt_concepts = []
+            if sememe.get('alternative_sememes'):
+                for alt in sememe['alternative_sememes']:
+                    if isinstance(alt, dict) and 'data' in alt and 'concept' in alt['data']:
+                        alt_concepts.append(alt['data']['concept'])
+                    elif isinstance(alt, str):
+                        alt_concepts.append(alt)
+            
             clean_sememe = {
-                'node_index': sememe['node_index'],
-                'primary_sememe': sememe['primary_sememe']['data']['concept'] if sememe['primary_sememe'] else None,
-                'alternative_sememes': [alt['data']['concept'] if alt and 'data' in alt else str(alt) for alt in sememe['alternative_sememes']] if sememe['alternative_sememes'] else [],
-                'node_vector_length': len(sememe['node_vector']) if sememe['node_vector'] is not None else 0
+                'node_index': sememe.get('node_index', 0),
+                'primary_sememe': primary_concept,
+                'alternative_sememes': alt_concepts,
+                'node_vector_length': len(sememe['node_vector']) if sememe.get('node_vector') is not None else 0
             }
             sememes_clean.append(clean_sememe)
         
