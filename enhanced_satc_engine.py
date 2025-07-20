@@ -577,15 +577,39 @@ class EnhancedSATCEngine:
         from sentence_transformers import SentenceTransformer
         self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
         
-        # Define consistent square dimensions
-        self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
-        self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
+        # Revolutionary Power-of-2 Architecture Integration
+        if self.config.use_power_of_2:
+            logger.info("🚀 INITIALIZING REVOLUTIONARY POWER-OF-2 ARCHITECTURE")
+            self.power_layers, self.power_integrator, self.power_config = create_power_of_2_foundation()
+            self.using_power_of_2 = True
+            
+            # Define dimensions based on power-of-2 progression
+            self.embedding_dim = 2  # Start with 2D for Recognition phase
+            self.final_dim = 256    # End with 256D for Personality phase
+            self.structure_dim = 256  # Use final dimension for structure
+            logger.info(f"Power-of-2 progression: {self.power_config.layer_dims}")
+        else:
+            logger.info("Using legacy square dimension architecture")
+            self.using_power_of_2 = False
+            # Define consistent square dimensions (legacy)
+            self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
+            self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
+            
         self.hd_dim = self.config.hd_dim  # Hyper-dimensional space
         
-        # Initialize core components with square dimensions
-        self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)
-        self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)
-        self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)
+        # Initialize core components with appropriate dimensions
+        if self.using_power_of_2:
+            # Use Power-of-2 architecture
+            # Keep legacy components for compatibility but prepare for upgrade
+            self.deep_layers = DeepLayers(self.config, input_dim=self.final_dim)
+            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.final_dim)
+            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.final_dim)
+        else:
+            # Use legacy square architecture
+            self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)
+            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)
+            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)
+            
         self.sememe_db = SememeDatabase(sememe_db_path)
         self.dissonance_balancer = DissonanceBalancer(self.config)
         
@@ -597,11 +621,16 @@ class EnhancedSATCEngine:
         self.optimal_params = {}
         
         # Optimization
-        self.optimizer = torch.optim.Adam(
-            self.deep_layers.parameters(),
-            lr=1e-3,
-            weight_decay=1e-4
-        )
+        if self.using_power_of_2:
+            # Include Power-of-2 parameters in optimization
+            all_params = list(self.deep_layers.parameters()) + list(self.power_layers.parameters())
+            self.optimizer = torch.optim.Adam(all_params, lr=1e-3, weight_decay=1e-4)
+        else:
+            self.optimizer = torch.optim.Adam(
+                self.deep_layers.parameters(),
+                lr=1e-3,
+                weight_decay=1e-4
+            )
         
         # Performance tracking
         self.performance_metrics = {
@@ -611,13 +640,40 @@ class EnhancedSATCEngine:
             'dissonance_values': [],
             'processing_times': [],
             'memory_updates': 0,
-            'total_queries': 0
+            'total_queries': 0,
+            'power_of_2_active': self.using_power_of_2  # Track architecture type
         }
         
         # Training data for SOM
         self.som_training_data = []
         
-        logger.info(f"Enhanced SATC Engine initialized with dimensions: embedding={self.embedding_dim}, structure={self.structure_dim}, HD={self.hd_dim}")
+        architecture_type = "Power-of-2 Revolutionary" if self.using_power_of_2 else "Legacy Square"
+        logger.info(f"Enhanced SATC Engine initialized with {architecture_type} architecture")
+        logger.info(f"Dimensions: embedding={self.embedding_dim}, final={getattr(self, 'final_dim', self.structure_dim)}, HD={self.hd_dim}")
+        
+        # Test Power-of-2 integration on initialization
+        if self.using_power_of_2:
+            self._test_power_of_2_integration()
+    
+    def _test_power_of_2_integration(self):
+        """Test Power-of-2 integration on engine initialization"""
+        logger.info("Testing Power-of-2 integration...")
+        test_input = torch.randn(1, 2)  # 2D Recognition input
+        
+        try:
+            # Test power layers
+            output, intermediates = self.power_layers.forward(test_input)
+            invertibility_test = self.power_layers.test_invertibility(test_input)
+            
+            if invertibility_test['passed']:
+                logger.info("✅ Power-of-2 integration successful!")
+                logger.info(f"✅ Invertibility test: PASSED (error: {invertibility_test['error']:.6f})")
+            else:
+                logger.warning(f"⚠️  Invertibility test: FAILED (error: {invertibility_test['error']:.6f})")
+                
+        except Exception as e:
+            logger.error(f"❌ Power-of-2 integration failed: {str(e)}")
+            self.using_power_of_2 = False
     
     def process_query(self, query: str) -> Dict[str, Any]:
         """
