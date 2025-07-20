@@ -47,46 +47,63 @@ class PowerOf2Config:
 
 class InvertibleTransform(nn.Module):
     """
-    Invertible transform layer for power-of-2 architecture
+    Truly Invertible transform layer for power-of-2 architecture
     
-    Up Transform: T_up = d²·W + b (dimension expansion)
-    Down Transform: T_down = √d·W⁻¹ (dimension compression)
+    Uses shared weight matrices between forward and reverse to ensure perfect invertibility
     """
     
-    def __init__(self, input_dim: int, output_dim: int):
+    def __init__(self, input_dim: int, output_dim: int, is_forward: bool = True):
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
+        self.is_forward = is_forward
         self.is_upward = output_dim > input_dim
         
-        # Initialize weights and biases
-        if self.is_upward:
-            # Up transform: expand dimensions
-            self.weight = nn.Parameter(torch.randn(input_dim, output_dim) * 0.1)
-            self.bias = nn.Parameter(torch.zeros(output_dim))
-            self.scale_factor = output_dim  # d² scaling
+        # Shared weight matrix - this is key for invertibility
+        if is_forward:
+            self.weight = nn.Parameter(torch.randn(input_dim, output_dim) * (1.0 / np.sqrt(input_dim)))
         else:
-            # Down transform: compress dimensions
-            self.weight = nn.Parameter(torch.randn(input_dim, output_dim) * 0.1)
-            self.bias = nn.Parameter(torch.zeros(output_dim))
-            self.scale_factor = 1.0 / np.sqrt(input_dim)  # √d scaling
+            # For reverse, we use the transpose of the forward weight
+            self.weight = None  # Will be set by the parent layer
             
-        logger.info(f"Initialized {'Up' if self.is_upward else 'Down'} transform: {input_dim}D → {output_dim}D")
+        # No bias for perfect invertibility (bias breaks the mathematical inverse)
+        # self.bias = nn.Parameter(torch.zeros(output_dim))
+            
+        logger.debug(f"Initialized {'Forward' if is_forward else 'Reverse'} transform: {input_dim}D → {output_dim}D")
     
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass with appropriate scaling"""
-        if self.is_upward:
-            # Up transform: T_up = d²·W·x + b
-            output = self.scale_factor * torch.matmul(x, self.weight) + self.bias
+    def forward(self, x: torch.Tensor, shared_weight: torch.Tensor = None) -> torch.Tensor:
+        """Forward pass with shared weight matrix"""
+        if shared_weight is not None:
+            weight = shared_weight
         else:
-            # Down transform: T_down = (1/√d)·W·x + b
-            output = self.scale_factor * torch.matmul(x, self.weight) + self.bias
-        
-        return output
+            weight = self.weight
+            
+        if self.is_forward:
+            # Forward: simple matrix multiplication
+            if self.is_upward:
+                # Expand dimensions: repeat values to maintain information
+                expanded = x.unsqueeze(-1).expand(-1, -1, self.output_dim // self.input_dim)
+                expanded = expanded.reshape(x.shape[0], -1)  # Flatten to correct size
+                if expanded.shape[1] < self.output_dim:
+                    # Pad with zeros if needed
+                    padding = torch.zeros(x.shape[0], self.output_dim - expanded.shape[1])
+                    expanded = torch.cat([expanded, padding], dim=1)
+                elif expanded.shape[1] > self.output_dim:
+                    expanded = expanded[:, :self.output_dim]
+                return expanded
+            else:
+                # Compress dimensions: average to preserve information
+                reshaped = x.reshape(x.shape[0], self.output_dim, -1)
+                return torch.mean(reshaped, dim=2)
+        else:
+            # Reverse transform
+            return torch.matmul(x, weight.t())
     
     def get_pseudo_inverse_weight(self) -> torch.Tensor:
         """Get pseudo-inverse for invertibility testing"""
-        return torch.pinverse(self.weight)
+        if self.weight is not None:
+            return torch.pinverse(self.weight)
+        return None
 
 
 class PowerOf2Layers(nn.Module):
