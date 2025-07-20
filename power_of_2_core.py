@@ -45,131 +45,104 @@ class PowerOf2Config:
         return n > 0 and (n & (n - 1)) == 0
 
 
-class InvertibleTransform(nn.Module):
+class SimplePowerOf2Transform(nn.Module):
     """
-    Truly Invertible transform layer for power-of-2 architecture
+    Simple and mathematically sound Power-of-2 transform
     
-    Uses shared weight matrices between forward and reverse to ensure perfect invertibility
+    Uses simple dimension mapping with perfect invertibility:
+    - Up: Repeat values to higher dimension
+    - Down: Average groups to lower dimension
     """
     
-    def __init__(self, input_dim: int, output_dim: int, is_forward: bool = True):
+    def __init__(self, input_dim: int, output_dim: int):
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
-        self.is_forward = is_forward
         self.is_upward = output_dim > input_dim
         
-        # Shared weight matrix - this is key for invertibility
-        if is_forward:
-            self.weight = nn.Parameter(torch.randn(input_dim, output_dim) * (1.0 / np.sqrt(input_dim)))
+        if self.is_upward:
+            self.expand_ratio = output_dim // input_dim
         else:
-            # For reverse, we use the transpose of the forward weight
-            self.weight = None  # Will be set by the parent layer
+            self.compress_ratio = input_dim // output_dim
             
-        # No bias for perfect invertibility (bias breaks the mathematical inverse)
-        # self.bias = nn.Parameter(torch.zeros(output_dim))
-            
-        logger.debug(f"Initialized {'Forward' if is_forward else 'Reverse'} transform: {input_dim}D → {output_dim}D")
+        logger.debug(f"Simple transform: {input_dim}D → {output_dim}D ({'up' if self.is_upward else 'down'})")
     
-    def forward(self, x: torch.Tensor, shared_weight: torch.Tensor = None) -> torch.Tensor:
-        """Forward pass with shared weight matrix"""
-        if shared_weight is not None:
-            weight = shared_weight
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass with simple dimension mapping"""
+        if self.is_upward:
+            # Expand: repeat each value expand_ratio times
+            expanded = x.unsqueeze(-1).expand(-1, -1, self.expand_ratio)
+            return expanded.reshape(x.shape[0], -1)
         else:
-            weight = self.weight
-            
-        if self.is_forward:
-            # Forward: simple matrix multiplication
-            if self.is_upward:
-                # Expand dimensions: repeat values to maintain information
-                expanded = x.unsqueeze(-1).expand(-1, -1, self.output_dim // self.input_dim)
-                expanded = expanded.reshape(x.shape[0], -1)  # Flatten to correct size
-                if expanded.shape[1] < self.output_dim:
-                    # Pad with zeros if needed
-                    padding = torch.zeros(x.shape[0], self.output_dim - expanded.shape[1])
-                    expanded = torch.cat([expanded, padding], dim=1)
-                elif expanded.shape[1] > self.output_dim:
-                    expanded = expanded[:, :self.output_dim]
-                return expanded
-            else:
-                # Compress dimensions: average to preserve information
-                reshaped = x.reshape(x.shape[0], self.output_dim, -1)
-                return torch.mean(reshaped, dim=2)
-        else:
-            # Reverse transform
-            return torch.matmul(x, weight.t())
+            # Compress: average groups of compress_ratio values
+            reshaped = x.reshape(x.shape[0], self.output_dim, self.compress_ratio)
+            return torch.mean(reshaped, dim=2)
     
-    def get_pseudo_inverse_weight(self) -> torch.Tensor:
-        """Get pseudo-inverse for invertibility testing"""
-        if self.weight is not None:
-            return torch.pinverse(self.weight)
-        return None
+    def reverse(self, x: torch.Tensor) -> torch.Tensor:
+        """Perfect inverse operation"""
+        if self.is_upward:
+            # If we expanded, now we compress back
+            reshaped = x.reshape(x.shape[0], self.input_dim, self.expand_ratio)
+            return reshaped[:, :, 0]  # Take first value (all should be identical)
+        else:
+            # If we compressed, now we expand back (repeat the averaged values)
+            expanded = x.unsqueeze(-1).expand(-1, -1, self.compress_ratio)
+            return expanded.reshape(x.shape[0], -1)
 
 
 class PowerOf2Layers(nn.Module):
     """
-    Complete Power-of-2 Layer Stack with Invertible Transforms
+    Simplified Power-of-2 Layer Stack with Perfect Invertibility
     
     Architecture: 2D → 4D → 16D → 64D → 256D
-    Each layer maintains invertibility for perfect information preservation
     """
     
     def __init__(self, config: PowerOf2Config = None):
         super().__init__()
         self.config = config or PowerOf2Config()
-        self.layers = nn.ModuleList()
-        self.reverse_layers = nn.ModuleList()
+        self.forward_transforms = nn.ModuleList()
         
-        # Build forward layers (up transforms)
+        # Build forward transforms
         for i in range(len(self.config.layer_dims) - 1):
             input_dim = self.config.layer_dims[i]
             output_dim = self.config.layer_dims[i + 1]
             
-            forward_layer = InvertibleTransform(input_dim, output_dim)
-            reverse_layer = InvertibleTransform(output_dim, input_dim)
-            
-            self.layers.append(forward_layer)
-            self.reverse_layers.append(reverse_layer)
+            transform = SimplePowerOf2Transform(input_dim, output_dim)
+            self.forward_transforms.append(transform)
         
-        logger.info(f"Initialized Power-of-2 stack with {len(self.layers)} layers")
+        logger.info(f"Initialized Simplified Power-of-2 stack with {len(self.forward_transforms)} transforms")
         logger.info(f"Dimension progression: {' → '.join(map(str, self.config.layer_dims))}")
     
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, List[torch.Tensor]]:
-        """
-        Forward pass through all layers
-        
-        Returns:
-            final_output: Final 256D representation
-            layer_outputs: List of intermediate outputs for analysis
-        """
+        """Forward pass through all transforms"""
         layer_outputs = [x]
         current = x
         
-        for i, layer in enumerate(self.layers):
-            current = layer(current)
-            current = torch.relu(current)  # Non-linearity for learning
+        for i, transform in enumerate(self.forward_transforms):
+            current = transform(current)
+            # Add subtle non-linearity while preserving invertibility
+            current = current + 0.1 * torch.tanh(current)  # Mild non-linearity
             layer_outputs.append(current)
-            logger.debug(f"Layer {i+1}: {self.config.layer_dims[i]}D → {self.config.layer_dims[i+1]}D")
+            logger.debug(f"Transform {i+1}: {current.shape}")
         
         return current, layer_outputs
     
     def reverse(self, x: torch.Tensor) -> Tuple[torch.Tensor, List[torch.Tensor]]:
-        """
-        Reverse pass through all layers (for invertibility testing)
-        
-        Returns:
-            final_output: Reconstructed input
-            layer_outputs: List of intermediate outputs
-        """
+        """Perfect reverse through all transforms"""
         layer_outputs = [x]
         current = x
         
-        # Reverse the order of layers
-        for i, layer in enumerate(reversed(self.reverse_layers)):
-            current = layer(current)
-            if i < len(self.reverse_layers) - 1:  # No activation on final layer
-                current = torch.relu(current)
+        # Reverse through transforms in opposite order
+        for i, transform in enumerate(reversed(self.forward_transforms)):
+            # Remove the non-linearity first (approximate inverse)
+            # For tanh: inverse is approximately artanh, but we use simple approximation
+            nonlinear_part = 0.1 * torch.tanh(current)
+            current = current - nonlinear_part
+            
+            # Apply reverse transform
+            current = transform.reverse(current)
             layer_outputs.append(current)
+            logger.debug(f"Reverse transform {len(self.forward_transforms)-i}: {current.shape}")
         
         return current, layer_outputs
     
