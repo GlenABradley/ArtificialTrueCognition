@@ -19,7 +19,7 @@ from typing import Dict, Any, List
 import numpy as np
 
 # Backend URL from environment
-BACKEND_URL = "https://ce2df387-3b1f-4e55-a3ac-196b6793ba9c.preview.emergentagent.com/api"
+BACKEND_URL = "https://0d0327f1-b3e8-4760-9b4f-e767b10bd743.preview.emergentagent.com/api"
 
 class SATCBackendTester:
     """Comprehensive backend testing for SATC Engine"""
