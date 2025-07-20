@@ -33,6 +33,9 @@ import faiss
 import json
 from pathlib import Path
 
+# Import our revolutionary Power-of-2 foundation
+from power_of_2_core import PowerOf2Layers, PowerOf2Config, PowerOf2Integrator, create_power_of_2_foundation
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
