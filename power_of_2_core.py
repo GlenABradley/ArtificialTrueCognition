@@ -120,8 +120,7 @@ class PowerOf2Layers(nn.Module):
         
         for i, transform in enumerate(self.forward_transforms):
             current = transform(current)
-            # Add subtle non-linearity while preserving invertibility
-            current = current + 0.1 * torch.tanh(current)  # Mild non-linearity
+            # Pure linear transforms for perfect invertibility
             layer_outputs.append(current)
             logger.debug(f"Transform {i+1}: {current.shape}")
         
@@ -134,11 +133,6 @@ class PowerOf2Layers(nn.Module):
         
         # Reverse through transforms in opposite order
         for i, transform in enumerate(reversed(self.forward_transforms)):
-            # Remove the non-linearity first (approximate inverse)
-            # For tanh: inverse is approximately artanh, but we use simple approximation
-            nonlinear_part = 0.1 * torch.tanh(current)
-            current = current - nonlinear_part
-            
             # Apply reverse transform
             current = transform.reverse(current)
             layer_outputs.append(current)
