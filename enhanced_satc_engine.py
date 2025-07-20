@@ -43,11 +43,15 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SATCConfig:
     """Configuration class for SATC Engine"""
-    # Core dimensions - Square progression architecture
+    # Core dimensions - Power-of-2 progression architecture
     hd_dim: int = 10000
     embedding_dim: int = 784  # 28² = 784 (close to 768 but perfect square)
     
-    # Square progression for deep layers
+    # Revolutionary Power-of-2 layer progression
+    use_power_of_2: bool = True  # Enable revolutionary architecture
+    power_of_2_dims: List[int] = field(default_factory=lambda: [2, 4, 16, 64, 256])
+    
+    # Legacy Square progression for deep layers (fallback)
     layer_squares: List[int] = field(default_factory=lambda: [
         784,   # 28² - Input embedding dimension  
         625,   # 25² - First compression
