@@ -537,11 +537,11 @@ const Home = () => {
     <div className="home-page">
       <header className="app-header">
         <div className="hero-section">
-          <h1 className="hero-title">🧠 Enhanced SATC</h1>
-          <p className="hero-subtitle">Artificial True Cognition System</p>
+          <h1 className="hero-title">🧠 ATC Research System</h1>
+          <p className="hero-subtitle">Artificial True Cognition Research Prototype</p>
           <p className="hero-description">
-            Revolutionary cognitive architecture that achieves genuine artificial cognition 
-            through emergent semantic processing and the Syncopation engine.
+            Experimental multi-phase cognitive processing system combining established machine learning 
+            techniques with research approaches toward artificial general intelligence.
           </p>
         </div>
 
