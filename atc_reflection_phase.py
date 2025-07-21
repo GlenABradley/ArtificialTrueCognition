@@ -207,8 +207,15 @@ class MetaCognitionEngine:
         strategy_input[2] = meta_analysis['learning_potential']
         strategy_input[3] = meta_analysis['meta_confidence']
         
-        # Add improvement direction
-        improvement_vector = torch.tensor(meta_analysis['improvement_direction'][:12])
+        # Add improvement direction with proper dimension handling
+        improvement_direction = meta_analysis.get('improvement_direction', [0.0] * 16)
+        if len(improvement_direction) >= 12:
+            improvement_vector = torch.tensor(improvement_direction[:12], dtype=torch.float32)
+        else:
+            # Pad to 12 dimensions
+            padded_direction = list(improvement_direction) + [0.0] * (12 - len(improvement_direction))
+            improvement_vector = torch.tensor(padded_direction, dtype=torch.float32)
+        
         strategy_input[4:16] = improvement_vector
         
         # Generate strategy adjustments
