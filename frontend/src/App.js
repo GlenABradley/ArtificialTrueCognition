@@ -324,8 +324,8 @@ const CognitionInterface = () => {
   return (
     <div className="cognition-interface">
       <div className="header">
-        <h1>🧠 Enhanced SATC Engine</h1>
-        <p className="subtitle">Artificial True Cognition System</p>
+        <h1>🧠 ATC Research System</h1>
+        <p className="subtitle">Multi-Phase Cognitive Processing Prototype</p>
         <div className="header-actions">
           <button 
             onClick={() => setShowTraining(!showTraining)}
