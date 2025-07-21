@@ -175,12 +175,12 @@ class SATCBackendTester:
                     phase_details.append(f"Reflection (16D): Meta-coherence {meta_coherence:.3f}")
                 
                 # Volition (64D) - Check goal formation
-                if goal_count > 0:
+                if goal_count is not None and goal_count > 0:
                     phases_active += 1
                     phase_details.append(f"Volition (64D): {goal_count} goals formed")
                 
                 # Personality (256D) - Check consciousness level
-                if consciousness_level > 0.4:  # 40%+ threshold
+                if consciousness_level is not None and consciousness_level > 0.4:  # 40%+ threshold
                     phases_active += 1
                     phase_details.append(f"Personality (256D): Consciousness {consciousness_level:.3f}")
                 
