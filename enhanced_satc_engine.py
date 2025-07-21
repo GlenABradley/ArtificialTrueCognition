@@ -917,8 +917,48 @@ class EnhancedSATCEngine:
                         logger.info(f"✅ Reflection complete: meta-coherence={result['meta_coherence']:.3f}")
                     else:
                         logger.warning("⚠️  Reflection failed, continuing without reflection")
+                        reflection_result = None
                 except Exception as e:
                     logger.warning(f"⚠️  Reflection error: {str(e)}")
+                    reflection_result = None
+            else:
+                reflection_result = None
+            
+            # Step 4: 64D Volition (if enabled and we have complex reasoning)
+            if (result.get('phase', '').startswith('cognition') and self.using_volition_64d and 
+                result.get('coherence', 0) > 0.1):  # Only if cognition was somewhat successful
+                
+                logger.info("🎯 Phase 4: Volition (64D)")
+                try:
+                    # Create volition context
+                    volition_context = {
+                        'urgency': 0.7,  # Moderate urgency for user queries
+                        'complexity': min(result.get('reasoning_steps', 1) / 10.0, 1.0),
+                        'novelty': 1.0 - result.get('coherence', 0.5),  # Novel if low coherence
+                        'importance': 0.8,  # User queries are generally important
+                        'query_type': 'user_request',
+                        'cognition_success': result.get('success', False)
+                    }
+                    
+                    volition_result = self.volition_processor.exercise_volition(
+                        volition_context, 
+                        reflection_result
+                    )
+                    
+                    if volition_result['success']:
+                        # Enhance result with volition insights
+                        result['volition'] = volition_result
+                        result['decision_confidence'] = volition_result.get('coherence', 0.0)
+                        result['goal_count'] = volition_result.get('goal_count', 0)
+                        result['dominant_value'] = volition_result.get('dominant_value', 'unknown')
+                        result['autonomous_goals'] = volition_result.get('new_goals_formed', 0)
+                        result['ethical_compliance'] = volition_result.get('ethical_compliance', True)
+                        logger.info(f"✅ Volition complete: goals={result['goal_count']}, value={result['dominant_value']}")
+                    else:
+                        logger.warning("⚠️  Volition failed, continuing without autonomous behavior")
+                        
+                except Exception as e:
+                    logger.warning(f"⚠️  Volition error: {str(e)}")
             
             return result
             
