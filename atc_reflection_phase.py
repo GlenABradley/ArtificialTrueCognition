@@ -495,11 +495,50 @@ class ReflectionProcessor:
             
             # Step 5: Meta-learning
             logger.debug("Step 5: Meta-learning")
-            meta_learning_input = torch.cat([
-                torch.tensor(list(cognition_result.get('cognition_4d', [0]*16))[:16]),
-                torch.tensor([meta_analysis[k] for k in ['meta_coherence', 'strategy_assessment', 'learning_potential', 'meta_confidence']] + [0]*12)[:16],
-                reflection_output
-            ])[:48]
+            
+            # Create meta-learning input with proper dimension handling
+            try:
+                # Component 1: Cognition 4D (ensure exactly 16 dimensions)
+                cognition_4d_data = cognition_result.get('cognition_4d', [0]*16)
+                if len(cognition_4d_data) >= 16:
+                    cognition_component = torch.tensor(cognition_4d_data[:16], dtype=torch.float32)
+                else:
+                    # Pad to 16 dimensions
+                    padded_data = list(cognition_4d_data) + [0.0] * (16 - len(cognition_4d_data))
+                    cognition_component = torch.tensor(padded_data, dtype=torch.float32)
+                
+                # Component 2: Meta-analysis (ensure exactly 16 dimensions)
+                meta_keys = ['meta_coherence', 'strategy_assessment', 'learning_potential', 'meta_confidence']
+                meta_values = [meta_analysis.get(k, 0.0) for k in meta_keys]
+                meta_values.extend([0.0] * 12)  # Pad to 16 total
+                meta_component = torch.tensor(meta_values[:16], dtype=torch.float32)
+                
+                # Component 3: Reflection output (already 16D)
+                reflection_component = reflection_output[:16] if len(reflection_output) >= 16 else torch.cat([
+                    reflection_output, 
+                    torch.zeros(16 - len(reflection_output))
+                ])
+                
+                # Concatenate components (16 + 16 + 16 = 48D)
+                meta_learning_input = torch.cat([
+                    cognition_component,
+                    meta_component, 
+                    reflection_component
+                ])
+                
+                # Ensure exactly 48 dimensions
+                if len(meta_learning_input) > 48:
+                    meta_learning_input = meta_learning_input[:48]
+                elif len(meta_learning_input) < 48:
+                    padding = torch.zeros(48 - len(meta_learning_input))
+                    meta_learning_input = torch.cat([meta_learning_input, padding])
+                
+                logger.debug(f"Meta-learning input shape: {meta_learning_input.shape}")
+                
+            except Exception as e:
+                logger.warning(f"Meta-learning input creation failed: {e}")
+                # Fallback: create 48D zero vector
+                meta_learning_input = torch.zeros(48)
             
             meta_learning_output = self.meta_learner(meta_learning_input)
             
