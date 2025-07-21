@@ -314,112 +314,110 @@ class DeepLayers(nn.Module):
 
 class SOMClustering:
     """
-    🗺️ SELF-ORGANIZING MAP (SOM) - Spatial Brain Organization (Novice Guide)
+    Self-Organizing Map Implementation for Spatial Clustering
     
-    🎓 WHAT IS A SELF-ORGANIZING MAP?
-    Imagine your brain organizing memories spatially - similar memories cluster together
-    in nearby locations. That's exactly what a SOM does! It creates a 2D "map" where
-    similar concepts are placed close to each other.
+    IMPLEMENTATION STATUS: FULLY IMPLEMENTED
     
-    🧠 REAL-WORLD ANALOGY:
-    Think of organizing a library - you put similar books near each other on shelves.
-    A SOM does this automatically for data, creating "neighborhoods" of similar information.
+    Technical Details:
+    - Algorithm: Kohonen Self-Organizing Map with competitive learning
+    - Grid Structure: 2D neuron grid (default 10x10 = 100 neurons)
+    - Training: Unsupervised learning with neighborhood cooperation
+    - Input Handling: Automatic dimensionality adjustment via padding/truncation
     
-    🔬 HOW IT WORKS:
-    1. Start with a grid of neurons (like a city grid)
-    2. Each neuron has "weights" (what it responds to)
-    3. For each data point, find the "best matching neuron"
-    4. Update that neuron and its neighbors to be more similar to the data
-    5. Over time, the map self-organizes into meaningful clusters!
+    Mathematical Foundation:
+    - Competitive Learning: Neurons compete to respond to input patterns
+    - Neighborhood Function: Gaussian decay with adjustable radius
+    - Learning Rate Decay: Linear decay over training epochs
+    - Distance Metric: Euclidean distance for Best Matching Unit (BMU) selection
     
-    🏗️ TECHNICAL DETAILS:
-    - Grid Size: 10x10 = 100 neurons in our "brain map"
-    - Input Dimension: Usually 1 (final compressed representation from DeepLayers)
-    - Learning: Uses Kohonen's algorithm (competitive learning)
-    - Output: Heat map showing activation patterns
+    Use Case:
+    Transforms input data into 2D spatial heat maps where similar inputs
+    activate nearby regions, enabling spatial visualization of high-dimensional
+    data relationships.
+    
+    Implementation Notes:
+    - Standard Kohonen algorithm with neighborhood cooperation
+    - Configurable grid size and learning parameters
+    - Heat map projection for trained networks
+    - Graceful handling of dimension mismatches
     """
     
     def __init__(self, grid_size: int = 10, input_dim: int = 1):
         """
-        🏗️ CONSTRUCTOR - Building the Self-Organizing Brain Map
+        Initialize self-organizing map with specified grid dimensions.
         
         Args:
-            grid_size: Size of the neuron grid (10 = 10x10 = 100 neurons)
-            input_dim: Dimensions of input data (1 = final square dimension)
+            grid_size: Size of square neuron grid (grid_size × grid_size neurons)
+            input_dim: Dimensionality of input feature vectors
         """
-        self.grid_size = grid_size      # How big our neural map is (10x10 grid)
-        self.input_dim = input_dim      # How many features each data point has
+        self.grid_size = grid_size      # Spatial grid dimensions
+        self.input_dim = input_dim      # Input feature dimensionality
         
-        # 🧠 INITIALIZE NEURON WEIGHTS - Each neuron starts with random "preferences"
+        # Initialize neuron weight vectors with random values
         # Shape: [grid_height, grid_width, input_features]
         self.weights = np.random.randn(grid_size, grid_size, input_dim)
         
-        # 📚 LEARNING PARAMETERS - How fast the brain learns and adapts
-        self.learning_rate = 0.1                    # How quickly neurons adapt (10% change per step)
-        self.neighborhood_radius = grid_size // 2   # How far influence spreads (5 neurons radius)
+        # Learning parameters
+        self.learning_rate = 0.1                    # Initial learning rate
+        self.neighborhood_radius = grid_size // 2   # Initial neighborhood radius
         
     def train(self, data: np.ndarray, epochs: int = 100):
         """
-        🎓 TRAINING THE SELF-ORGANIZING MAP (Novice Guide)
+        Train self-organizing map using Kohonen algorithm.
         
-        This is where the magic happens! We show the SOM lots of data examples,
-        and it learns to organize itself spatially based on the patterns it sees.
-        
-        🔄 THE TRAINING PROCESS:
-        1. Show a data sample to all neurons
-        2. Find which neuron responds best (Best Matching Unit - BMU)
-        3. Make that neuron AND its neighbors more similar to the data
-        4. Repeat for all data samples
-        5. Do this many times (epochs) until the map stabilizes
-        
-        🧠 WHY IT WORKS:
-        - Competitive learning: Neurons compete to respond to each data point
-        - Cooperative learning: Winning neuron helps its neighbors learn too
-        - Adaptive learning: Learning gets more focused over time
+        Training Process:
+        1. Present each data sample to all neurons
+        2. Find Best Matching Unit (BMU) with minimum distance
+        3. Update BMU and neighborhood neurons toward sample
+        4. Decay learning parameters over time
         
         Args:
-            data: Training data samples (numpy array)
-            epochs: How many times to go through all the data (100 iterations)
+            data: Training data array, shape [n_samples, n_features]
+            epochs: Number of training iterations through dataset
+            
+        Implementation Notes:
+        - Linear decay of learning rate and neighborhood radius
+        - Gaussian neighborhood function for weight updates
+        - Automatic data dimension adjustment
         """
-        # 📏 ENSURE DATA HAS PROPER DIMENSIONS - Handle different input formats
-        if data.ndim == 1:  # If data is 1D, reshape to 2D
-            data = data.reshape(1, -1)  # [N] → [1, N]
+        # Ensure proper data dimensionality
+        if data.ndim == 1:
+            data = data.reshape(1, -1)  # Convert 1D to 2D
         
-        # 🔧 HANDLE DIMENSION MISMATCHES - Make data compatible with our neuron weights
+        # Handle input dimension compatibility
         if data.shape[-1] != self.input_dim:
             if data.shape[-1] < self.input_dim:
-                # 📈 PAD WITH ZEROS - Make data bigger if too small
+                # Pad with zeros to match expected dimension
                 padding = np.zeros((data.shape[0], self.input_dim - data.shape[-1]))
                 data = np.concatenate([data, padding], axis=-1)
             else:
-                # ✂️ TRUNCATE - Make data smaller if too big
+                # Truncate to expected dimension
                 data = data[..., :self.input_dim]
         
-        # 🎓 MAIN TRAINING LOOP - The learning process
+        # Main training loop
         for epoch in range(epochs):
-            # 📉 DECAY LEARNING PARAMETERS - Learn less aggressively over time
-            current_lr = self.learning_rate * (1 - epoch / epochs)          # Learning rate decreases
-            current_radius = self.neighborhood_radius * (1 - epoch / epochs) # Neighborhood shrinks
+            # Decay learning parameters linearly
+            current_lr = self.learning_rate * (1 - epoch / epochs)
+            current_radius = self.neighborhood_radius * (1 - epoch / epochs)
             
-            # 🔄 PROCESS EACH DATA SAMPLE
+            # Process each training sample
             for sample in data:
-                # 🔍 FIND BEST MATCHING UNIT (BMU) - Which neuron responds best?
-                # Calculate distance from sample to each neuron's weights
-                distances = np.linalg.norm(self.weights - sample, axis=2)  # Euclidean distance
-                bmu_idx = np.unravel_index(np.argmin(distances), distances.shape)  # Find minimum
+                # Find Best Matching Unit (minimum Euclidean distance)
+                distances = np.linalg.norm(self.weights - sample, axis=2)
+                bmu_idx = np.unravel_index(np.argmin(distances), distances.shape)
                 
-                # 🤝 UPDATE WEIGHTS IN NEIGHBORHOOD - Cooperative learning
-                for i in range(self.grid_size):      # For each row
-                    for j in range(self.grid_size):  # For each column
-                        # 📏 CALCULATE DISTANCE TO BMU in the grid (not in feature space)
+                # Update weights in neighborhood around BMU
+                for i in range(self.grid_size):
+                    for j in range(self.grid_size):
+                        # Calculate spatial distance to BMU
                         distance_to_bmu = np.sqrt((i - bmu_idx[0])**2 + (j - bmu_idx[1])**2)
                         
-                        # 🎯 UPDATE IF WITHIN NEIGHBORHOOD RADIUS
+                        # Update if within neighborhood radius
                         if distance_to_bmu <= current_radius:
-                            # 💫 CALCULATE INFLUENCE (Gaussian decay with distance)
+                            # Gaussian neighborhood function
                             influence = np.exp(-distance_to_bmu**2 / (2 * current_radius**2))
                             
-                            # 🔄 UPDATE NEURON WEIGHTS - Move closer to the sample
+                            # Kohonen weight update rule
                             self.weights[i, j] += current_lr * influence * (sample - self.weights[i, j])
     
     def project(self, data: np.ndarray) -> np.ndarray:
