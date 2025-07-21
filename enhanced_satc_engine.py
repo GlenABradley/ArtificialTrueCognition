@@ -719,7 +719,10 @@ class EnhancedSATCEngine:
     
     def process_query(self, query: str) -> Dict[str, Any]:
         """
-        Main query processing pipeline
+        Revolutionary ATC Query Processing Pipeline
+        
+        Phase 1: Recognition (2D Fast Path)
+        Phase 2: Cognition (4D+ Slow Path) - if Recognition fails
         
         Args:
             query: Input query string
@@ -730,38 +733,115 @@ class EnhancedSATCEngine:
         start_time = time.time()
         self.performance_metrics['total_queries'] += 1
         
-        logger.info(f"Processing query: {query[:50]}...")
+        logger.info(f"🔍 ATC Processing query: {query[:50]}...")
         
         try:
-            # 1. Observation: Embed query
-            intent_vector = self.embed_query(query)
+            # REVOLUTIONARY ATC PIPELINE
+            if self.using_recognition_phase:
+                # Phase 1: Recognition (2D Fast Path)
+                logger.info("🚀 Phase 1: Recognition (2D)")
+                recognition_result = self.recognition_processor.recognize(query, self.embedding_model)
+                
+                if recognition_result['match_found']:
+                    # Recognition SUCCESS - Fast path complete
+                    self.performance_metrics['recognition_hits'] += 1
+                    processing_time = time.time() - start_time
+                    
+                    result = {
+                        'query': query,
+                        'phase': 'recognition',
+                        'success': True,
+                        'output': recognition_result['procedure'],
+                        'coherence': recognition_result['similarity'],
+                        'dissonance': 0.0,  # Low dissonance for known patterns
+                        'processing_time': processing_time,
+                        'method': 'atc_recognition_2d',
+                        'pattern_2d': recognition_result['pattern_2d'],
+                        'metadata': recognition_result.get('metadata', {})
+                    }
+                    
+                    logger.info(f"✅ Recognition SUCCESS: {recognition_result['similarity']:.3f} similarity")
+                    return result
+                
+                else:
+                    # Recognition MISS - Escalate to Cognition phase
+                    logger.info("🔄 Recognition MISS - Escalating to Cognition...")
+                    self.performance_metrics['cognition_processes'] += 1
             
-            # 2. Recognition phase check
-            if self.recognition_check(intent_vector):
-                result = self.syncopation_quick_path(intent_vector)
-                self.performance_metrics['recognition_hits'] += 1
-                logger.info("Recognition phase successful")
+            # Phase 2: Cognition (4D+ Slow Path) - Revolutionary or Legacy
+            if self.using_power_of_2:
+                logger.info("🧠 Phase 2: Cognition (Power-of-2 Architecture)")
+                result = self._cognition_power_of_2(query, start_time)
             else:
-                result = self.cognition_phase(intent_vector, query)
-                self.performance_metrics['cognition_processes'] += 1
-                logger.info("Cognition phase activated")
+                logger.info("🧠 Phase 2: Cognition (Legacy Architecture)")
+                result = self._cognition_legacy(query, start_time)
             
-            # Track processing time
-            processing_time = time.time() - start_time
-            self.performance_metrics['processing_times'].append(processing_time)
-            result['processing_time'] = processing_time
+            # Learn successful cognition results for future Recognition
+            if result['success'] and self.using_recognition_phase:
+                self.recognition_processor.learn_pattern(
+                    query, 
+                    result['output'], 
+                    self.embedding_model,
+                    {'learned_from_cognition': True, 'coherence': result.get('coherence', 0.0)}
+                )
+                logger.info("📚 Pattern learned for future Recognition")
             
-            logger.info(f"Query processed in {processing_time:.3f}s")
             return result
             
         except Exception as e:
-            logger.error(f"Error processing query: {str(e)}")
+            logger.error(f"❌ ATC processing failed: {str(e)}")
+            processing_time = time.time() - start_time
+            
             return {
-                'output': f"Error: {str(e)}",
+                'query': query,
                 'phase': 'error',
                 'success': False,
-                'processing_time': time.time() - start_time
+                'output': f'Error: {str(e)}',
+                'coherence': 0.0,
+                'dissonance': 1.0,
+                'processing_time': processing_time,
+                'method': 'error_handling',
+                'error': str(e)
             }
+    
+    def _cognition_power_of_2(self, query: str, start_time: float) -> Dict[str, Any]:
+        """
+        Cognition phase using Power-of-2 architecture
+        
+        This will be fully implemented in Milestone 3
+        For now, we simulate the 4D+ cognition process
+        """
+        processing_time = time.time() - start_time
+        
+        # Placeholder for Power-of-2 cognition
+        # TODO Milestone 3: Implement full 4D → 16D → 64D → 256D processing
+        
+        return {
+            'query': query,
+            'phase': 'cognition_power_of_2',
+            'success': True,  # Simulated success
+            'output': f"Power-of-2 Cognition processed: {query[:30]}...",
+            'coherence': 0.7,  # Moderate coherence for novel processing
+            'dissonance': 0.3,
+            'processing_time': processing_time,
+            'method': 'power_of_2_cognition_placeholder',
+            'dimensions_used': [2, 4, 16, 64, 256],
+            'next_milestone': 'Milestone 3: Full 4D Cognition Implementation'
+        }
+    
+    def _cognition_legacy(self, query: str, start_time: float) -> Dict[str, Any]:
+        """
+        Legacy cognition phase (existing Enhanced SATC)
+        """
+        # Use existing Enhanced SATC cognition logic
+        intent_vector = self.embed_query(query)
+        result = self.cognition_phase(intent_vector, query)
+        
+        processing_time = time.time() - start_time
+        result['processing_time'] = processing_time
+        result['method'] = 'legacy_enhanced_satc'
+        
+        return result
     
     def embed_query(self, query: str) -> torch.Tensor:
         """Embed query using real BERT embeddings with proper dimensionality"""
