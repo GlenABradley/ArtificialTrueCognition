@@ -91,16 +91,16 @@ class CognitionResponse(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict)
     
     # ATC Phase Data
-    meta_coherence: float = None
-    self_awareness: float = None
+    meta_coherence: Optional[float] = None
+    self_awareness: Optional[float] = None
     reflection_insights: List[str] = Field(default_factory=list)
-    goal_count: int = None
-    decision_confidence: float = None
-    dominant_value: str = None
-    consciousness_level: float = None
-    identity_id: str = None
-    identity_coherence: float = None
-    total_memories: int = None
+    goal_count: Optional[int] = None
+    decision_confidence: Optional[float] = None
+    dominant_value: Optional[str] = None
+    consciousness_level: Optional[float] = None
+    identity_id: Optional[str] = None
+    identity_coherence: Optional[float] = None
+    total_memories: Optional[int] = None
 
 class PerformanceMetrics(BaseModel):
     total_queries: int
