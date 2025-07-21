@@ -301,12 +301,11 @@ The user aims to develop a novel cognitive model based on artificial true cognit
 
 ## test_plan:
   current_focus:
-    - "SATC Core Engine API"
-    - "Enhanced SATC Engine Core"
-    - "SATC Cognition Interface"
-  stuck_tasks: []
+    - "ATC Reflection Phase"
+  stuck_tasks:
+    - "ATC Reflection Phase"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 ## agent_communication:
     - agent: "main"
