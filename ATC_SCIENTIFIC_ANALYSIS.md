@@ -416,31 +416,42 @@ Condition C: Parallel without communication (control for parallel processing alo
 - **Memory Consolidation**: Long-term pattern crystallization and evolution
 - **Adaptive Learning**: Continuous improvement without explicit training
 
-#### Empirical Validation Studies
-1. **Human Evaluation Protocol**: Design comprehensive human evaluation of system outputs
-2. **Cognitive Benchmark Comparison**: Test against established AI benchmarks (GLUE, SuperGLUE, etc.)
-3. **Ablation Studies**: Systematic component removal to identify critical elements
-4. **Cross-Domain Validation**: Test performance across multiple domains
+### Mathematical Framework for Circular Architecture
 
-#### Statistical Methodology Improvements
-1. **Power Analysis**: Determine required sample sizes for robust hypothesis testing
-2. **Control Group Design**: Implement proper experimental controls
-3. **Cross-Validation**: Implement k-fold cross-validation for generalizability
-4. **Effect Size Analysis**: Focus on practical significance beyond statistical significance
+#### **Circular Flow Dynamics**
+The proposed circular architecture requires mathematical modeling of convergent iterative processes:
 
-### Medium-term Research Questions (1-2 years)
+```
+Convergence Condition: ||S(t+1) - S(t)|| < ε
+where S(t) is cognitive state at iteration t
+ε is convergence threshold
 
-#### Theoretical Development
-1. **Mathematical Formalization**: Develop formal mathematical framework for multi-phase cognition
-2. **Information-Theoretic Analysis**: Characterize information flow and compression properties
-3. **Cognitive Mapping Validation**: Empirically test correspondence with human cognitive processes
-4. **Optimization Theory**: Develop theoretical foundations for multi-criteria quality optimization
+Stability Analysis: λ_max(∂S/∂S) < 1
+where λ_max is maximum eigenvalue of state transition Jacobian
+```
 
-#### Experimental Investigation
-1. **Longitudinal Studies**: Extended observation of learning and adaptation
-2. **Multi-Modal Extension**: Investigation of visual, auditory, and structured data processing
-3. **Emergent Behavior Analysis**: Systematic study of complex behaviors arising from component interaction
-4. **Scalability Analysis**: Performance characteristics under varying computational resources
+#### **Information Flow Optimization**
+Optimal communication pathways in full interconnection matrix:
+
+```
+Information Value: I(message) = -log₂(P(message))
+Routing Decision: Route if I(message) × W(sender,receiver) > θ
+where W is communication weight matrix, θ is routing threshold
+```
+
+### Legacy Research Priorities (Current Platform Enhancement)
+
+#### Immediate Research Priorities (6-12 months)
+- Human evaluation protocols for current system validation
+- Cognitive benchmark comparison against established AI systems
+- Statistical power analysis for robust hypothesis testing
+- Cross-domain validation studies
+
+#### Medium-term Research Questions (1-2 years)  
+- Mathematical formalization of multi-phase cognition
+- Information-theoretic analysis of current dimensional transformations
+- Longitudinal learning studies with current architecture
+- Multi-modal processing investigation
 
 ### Long-term Research Vision (2-5 years)
 
