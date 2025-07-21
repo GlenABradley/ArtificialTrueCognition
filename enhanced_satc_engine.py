@@ -974,9 +974,9 @@ class EnhancedSATCEngine:
             else:
                 reflection_result = None
             
-            # Step 4: 64D Volition (if enabled and we have complex reasoning)
+            # Step 4: 64D Volition (if enabled and we have any cognition processing)
             if (result.get('phase', '').startswith('cognition') and self.using_volition_64d and 
-                result.get('coherence', 0) > 0.1):  # Only if cognition was somewhat successful
+                result.get('coherence', 0) >= 0.1):  # Include exactly 0.1 coherence
                 
                 logger.info("🎯 Phase 4: Volition (64D)")
                 try:
