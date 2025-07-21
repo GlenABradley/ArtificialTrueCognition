@@ -546,31 +546,31 @@ const Home = () => {
         </div>
 
         <div className="features-section">
-          <h2>Key Features</h2>
+          <h2>System Components</h2>
           <div className="features-grid">
             <div className="feature-card">
-              <h3>🔄 Syncopation Engine</h3>
-              <p>Multi-dimensional semantic resonance cascades (12D→24D→48D→96D)</p>
+              <h3>🔗 Neural Processing</h3>
+              <p>12-layer neural network with square dimensional progression (784→1)</p>
             </div>
             <div className="feature-card">
-              <h3>⚡ Dual-Phase Processing</h3>
-              <p>Recognition (fast) + Cognition (deliberate) architecture</p>
+              <h3>⚡ Recognition System</h3>
+              <p>FAISS-based pattern matching with automatic learning (0.01-0.1s)</p>
             </div>
             <div className="feature-card">
-              <h3>🎯 Dissonance Balancing</h3>
-              <p>Optimal output generation through beam search and genetic algorithms</p>
+              <h3>🎯 Quality Optimization</h3>
+              <p>Beam search and genetic algorithms for output optimization</p>
             </div>
             <div className="feature-card">
-              <h3>🧠 Continual Learning</h3>
-              <p>EWC-based memory integration without catastrophic forgetting</p>
+              <h3>🧠 BERT Embeddings</h3>
+              <p>Real semantic processing via sentence-transformers</p>
             </div>
             <div className="feature-card">
-              <h3>🔬 HD Space Processing</h3>
-              <p>10,000+ dimensional semantic representation</p>
+              <h3>🔬 Experimental Phases</h3>
+              <p>Research implementation of reflection, volition, and personality phases</p>
             </div>
             <div className="feature-card">
-              <h3>📊 Performance Monitoring</h3>
-              <p>Real-time metrics and coherence tracking</p>
+              <h3>📊 Performance Tracking</h3>
+              <p>Comprehensive metrics and processing analytics</p>
             </div>
           </div>
         </div>
