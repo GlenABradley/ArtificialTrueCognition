@@ -807,6 +807,33 @@ class EnhancedSATCEngine:
             logger.error(f"❌ 16D Reflection phase integration failed: {str(e)}")
             self.using_reflection_16d = False
     
+    def _test_volition_64d_integration(self):
+        """Test 64D Volition phase integration on engine initialization"""
+        logger.info("Testing 64D Volition phase integration...")
+        
+        try:
+            # Test volition with sample context
+            test_context = {
+                'urgency': 0.7,
+                'complexity': 0.6,
+                'novelty': 0.8,
+                'importance': 0.9
+            }
+            
+            result = self.volition_processor.exercise_volition(test_context)
+            
+            if result['success']:
+                logger.info("✅ 64D Volition phase integration successful!")
+                confidence = result.get('coherence', 0)
+                goals = result.get('goal_count', 0)
+                logger.info(f"✅ Volition test: confidence={confidence:.3f}, goals={goals}")
+            else:
+                logger.warning(f"⚠️  64D Volition test: FAILED - {result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"❌ 64D Volition phase integration failed: {str(e)}")
+            self.using_volition_64d = False
+    
     def process_query(self, query: str) -> Dict[str, Any]:
         """
         Revolutionary ATC Query Processing Pipeline
