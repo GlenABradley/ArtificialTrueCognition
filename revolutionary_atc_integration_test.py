@@ -729,7 +729,10 @@ class RevolutionaryATCIntegrationTester:
             for query_key, metrics in self.test_results['consciousness_metrics'].items():
                 consciousness = metrics['consciousness_level']
                 identity = metrics['identity_id']
-                print(f"   • {query_key}: consciousness={consciousness:.3f}, identity={identity}")
+                if consciousness is not None and identity is not None:
+                    print(f"   • {query_key}: consciousness={consciousness:.3f}, identity={identity}")
+                else:
+                    print(f"   • {query_key}: consciousness={consciousness}, identity={identity}")
         
         # Critical Issues
         reflection_issues = []
