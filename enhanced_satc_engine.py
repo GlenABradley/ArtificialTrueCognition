@@ -428,46 +428,114 @@ class SOMClustering:
                             self.weights[i, j] += current_lr * influence * (sample - self.weights[i, j])
     
     def project(self, data: np.ndarray) -> np.ndarray:
-        """Project data onto SOM heat map"""
-        # Ensure data has correct dimensions - fix for dimension mismatch
+        """
+        🗺️ PROJECT DATA ONTO SOM HEAT MAP (Novice Guide)
+        
+        After training, this method takes new data and projects it onto our organized
+        brain map, creating a "heat map" showing which areas of the map are most activated.
+        
+        🔥 THINK OF IT LIKE:
+        - Showing a new photo to someone with organized photo albums
+        - They point to the album section that best matches the new photo
+        - The "heat" shows how strongly each section relates to the new photo
+        
+        🧠 HOW IT WORKS:
+        1. Take the input data point
+        2. Compare it to each neuron in our trained map
+        3. Calculate how similar the data is to each neuron
+        4. Create a heat map showing activation levels
+        5. Hot spots = areas that strongly match the input
+        
+        Args:
+            data: Input data to project onto the map
+            
+        Returns:
+            heat_map: 2D array showing activation levels (higher = better match)
+        """
+        # 📏 ENSURE DATA HAS CORRECT DIMENSIONS - Handle various input formats
         if data.ndim > 1:
-            # Flatten multi-dimensional data to 1D
+            # 🔽 FLATTEN - Convert multi-dimensional data to 1D
             data = data.flatten()
         elif data.ndim == 0:
-            # Handle scalar case
+            # 🔧 HANDLE SCALAR - Convert single number to array
             data = np.array([data])
         
-        # Adjust data dimension if needed
+        # 🔧 HANDLE DIMENSION MISMATCHES - Make data compatible with our map
         if len(data) != self.input_dim:
             if len(data) < self.input_dim:
-                # Pad with zeros
+                # 📈 PAD WITH ZEROS - Extend data if too small
                 padding = np.zeros(self.input_dim - len(data))
                 data = np.concatenate([data, padding])
             else:
-                # Truncate
+                # ✂️ TRUNCATE - Shorten data if too big
                 data = data[:self.input_dim]
         
+        # 🔥 CREATE HEAT MAP - Calculate activation for each neuron
         heat_map = np.zeros((self.grid_size, self.grid_size))
         
-        for i in range(self.grid_size):
-            for j in range(self.grid_size):
-                distance = np.linalg.norm(data - self.weights[i, j])
-                heat_map[i, j] = np.exp(-distance / 0.5)  # Temperature τ = 0.5
+        # 🔄 CALCULATE ACTIVATION FOR EACH NEURON in the grid
+        for i in range(self.grid_size):      # For each row
+            for j in range(self.grid_size):  # For each column
+                # 📏 CALCULATE SIMILARITY - How close is data to this neuron?
+                distance = np.linalg.norm(data - self.weights[i, j])  # Euclidean distance
+                
+                # 🌡️ CONVERT DISTANCE TO HEAT - Closer = Hotter (using Gaussian)
+                # Temperature τ = 0.5 controls how "sharp" the heat spots are
+                heat_map[i, j] = np.exp(-distance / 0.5)  # Exponential decay
         
-        return heat_map
+        return heat_map  # Return the brain activation map!
 
 class HDSpaceEncoder:
-    """Hyper-Dimensional Space Encoder with square input dimension"""
+    """
+    🚀 HYPER-DIMENSIONAL SPACE ENCODER - Expanding Into Rich Semantic Spaces (Novice Guide)
     
-    def __init__(self, hd_dim: int = 10000, input_dim: int = 1):  # Updated to match final square (1²)
-        self.hd_dim = hd_dim
-        self.input_dim = input_dim
-        self.encoder = nn.Linear(input_dim, hd_dim)
+    🎓 WHAT IS HYPER-DIMENSIONAL COMPUTING?
+    Imagine if instead of thinking in 3D (length, width, height), you could think in
+    10,000 dimensions! That's what HD computing does - it uses MASSIVE dimensional
+    spaces to represent information in incredibly rich ways.
+    
+    🧠 WHY SO MANY DIMENSIONS?
+    - More dimensions = more ways to represent subtle differences
+    - Like having 10,000 different ways to describe the color "blue"
+    - Enables the brain to capture incredibly nuanced semantic relationships
+    
+    🔄 ENCODE vs DECODE:
+    - ENCODE: Take small representation (1D) → Expand to huge space (10,000D)
+    - DECODE: Take huge representation (10,000D) → Compress back to small (1D)
+    - Like zooming into incredible detail, then zooming back out
+    
+    🔬 HD VECTOR OPERATIONS:
+    - BIND: Combine two concepts together (like "red" + "car" = "red car")
+    - BUNDLE: Add multiple concepts (like mixing different paint colors)
+    - These operations work beautifully in high dimensions!
+    
+    📊 MATHEMATICAL FOUNDATION:
+    - Uses linear transformations (matrix multiplication)
+    - Xavier initialization for stable gradients
+    - Vector normalization preserves HD properties
+    """
+    
+    def __init__(self, hd_dim: int = 10000, input_dim: int = 1):
+        """
+        🏗️ CONSTRUCTOR - Building the Hyper-Dimensional Thinking Space
+        
+        Args:
+            hd_dim: Size of hyper-dimensional space (10,000 dimensions!)
+            input_dim: Size of input (1 dimension from final square compression)
+        """
+        self.hd_dim = hd_dim          # How big our HD thinking space is (10,000D)
+        self.input_dim = input_dim    # How big our input is (1D from deep layers)
+        
+        # 🔄 ENCODER & DECODER NEURAL NETWORKS
+        # Encoder: 1D → 10,000D (expand to rich semantic space)
+        self.encoder = nn.Linear(input_dim, hd_dim)   
+        # Decoder: 10,000D → 1D (compress back to simple representation)
         self.decoder = nn.Linear(hd_dim, input_dim)
         
-        # Initialize weights for better HD properties
-        nn.init.xavier_uniform_(self.encoder.weight)
-        nn.init.xavier_uniform_(self.decoder.weight)
+        # ⚖️ INITIALIZE WEIGHTS FOR STABLE HD PROPERTIES
+        # Xavier initialization prevents gradient explosion/vanishing
+        nn.init.xavier_uniform_(self.encoder.weight)  # Encoder weights
+        nn.init.xavier_uniform_(self.decoder.weight)  # Decoder weights
         
     def encode(self, nodes: torch.Tensor) -> torch.Tensor:
         """Encode nodes to HD space"""
