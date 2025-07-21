@@ -543,6 +543,7 @@ class ReflectionProcessor:
             
         except Exception as e:
             logger.error(f"❌ 16D Reflection failed: {str(e)}")
+            logger.debug(f"Error details: {e}", exc_info=True)  # Add debug info
             processing_time = time.time() - start_time
             
             return {
