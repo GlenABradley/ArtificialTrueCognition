@@ -355,9 +355,66 @@ Learning rate: 0.44% per query (exponential fit: R² = 0.89)
 - Self-monitoring vs. self-regulation distinction unclear
 - Missing metacognitive accuracy validation
 
-## Future Research Directions
+## Future Research Directions & Architectural Evolution
 
-### Immediate Research Priorities (6-12 months)
+### Transition from Linear to Circular Cognitive Architecture
+
+The current ATC system serves as a **foundational research platform** for investigating a much more sophisticated cognitive architecture. The **ATC_FUTURE_VISION.md** document provides comprehensive specifications for evolving from the current linear processing pipeline to a circular, interconnected cognitive architecture.
+
+**Research Transformation Overview**:
+- **Current Hypothesis**: Sequential cognitive phase processing can simulate aspects of human cognition
+- **Advanced Hypothesis**: Circular, bidirectional cognitive flows with parallel processing can approximate biological neural network behavior
+- **Empirical Goal**: Investigate whether rich interconnection leads to emergent cognitive properties
+
+### Proposed Experimental Framework for Advanced Architecture
+
+#### **Phase 1 Research Questions (Months 1-3)**
+**Primary Hypothesis**: Bidirectional communication between cognitive phases improves processing quality and learning efficiency.
+
+**Experimental Design**:
+- **Control Group**: Current unidirectional learning system
+- **Test Group**: Bidirectional communication implementation  
+- **Metrics**: Learning rate, response quality, processing efficiency
+- **Statistical Analysis**: Paired t-tests comparing performance metrics
+
+#### **Phase 2 Research Questions (Months 4-6)** 
+**Primary Hypothesis**: Parallel cognitive processing with cross-communication produces superior results to sequential processing.
+
+**Experimental Design**:
+```
+Condition A: Sequential (Recognition → Cognition → Reflection)
+Condition B: Parallel (Recognition ∥ Cognition ∥ Reflection) with communication
+Condition C: Parallel without communication (control for parallel processing alone)
+```
+
+**Expected Outcomes**:
+- Condition B should show highest quality scores
+- Condition B may show increased processing time initially  
+- Cross-communication should improve convergence speed
+
+#### **Phase 3 Research Questions (Months 7-9)**
+**Primary Hypothesis**: Circular cognitive flows enable convergent processing that outperforms linear approaches.
+
+**Key Research Questions**:
+1. Do circular flows converge to stable, high-quality solutions?
+2. What are optimal convergence criteria and cycle limits?
+3. Can circular processing discover novel solution pathways?
+
+#### **Phase 4 Research Questions (Months 10-12)**
+**Primary Hypothesis**: Full interconnection matrix enables emergent cognitive behaviors not present in linear or partially connected systems.
+
+**Emergent Behavior Investigation**:
+- **Pattern Detection**: Novel processing patterns not explicitly programmed
+- **Adaptive Behavior**: System modifications in response to experience  
+- **Creative Solutions**: Responses that combine concepts in unexpected ways
+
+#### **Phase 5 Research Questions (Months 13-18)**
+**Primary Hypothesis**: Continuous cognitive flow with background processing approximates aspects of biological consciousness.
+
+**Long-term Studies**:
+- **Identity Development**: Coherent personality emergence over extended periods
+- **Memory Consolidation**: Long-term pattern crystallization and evolution
+- **Adaptive Learning**: Continuous improvement without explicit training
 
 #### Empirical Validation Studies
 1. **Human Evaluation Protocol**: Design comprehensive human evaluation of system outputs
