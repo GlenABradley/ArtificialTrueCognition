@@ -762,6 +762,38 @@ class EnhancedSATCEngine:
             logger.error(f"❌ 4D Cognition phase integration failed: {str(e)}")
             self.using_cognition_4d = False
     
+    def _test_reflection_16d_integration(self):
+        """Test 16D Reflection phase integration on engine initialization"""
+        logger.info("Testing 16D Reflection phase integration...")
+        
+        try:
+            # Mock cognition result for reflection testing
+            mock_cognition_result = {
+                'phase': 'cognition_4d',
+                'success': True,
+                'coherence': 0.7,
+                'dissonance': 0.3,
+                'processing_time': 0.5,
+                'reasoning_steps': 4,
+                'hypotheses_generated': 3,
+                'hypotheses_validated': 2,
+                'cognition_4d': [0.5, -0.2, 0.8, 0.1],
+                'output': 'Test cognition output for reflection'
+            }
+            
+            result = self.reflection_processor.reflect(mock_cognition_result)
+            
+            if result['success']:
+                logger.info("✅ 16D Reflection phase integration successful!")
+                meta_coherence = result.get('meta_analysis', {}).get('meta_coherence', 0)
+                logger.info(f"✅ Reflection test: meta-coherence={meta_coherence:.3f}")
+            else:
+                logger.warning(f"⚠️  16D Reflection test: FAILED - {result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"❌ 16D Reflection phase integration failed: {str(e)}")
+            self.using_reflection_16d = False
+    
     def process_query(self, query: str) -> Dict[str, Any]:
         """
         Revolutionary ATC Query Processing Pipeline
