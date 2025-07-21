@@ -253,49 +253,69 @@ class DeepLayers(nn.Module):
         self.layers.append(nn.Linear(input_dim, layer_dims[0]))
         
         # 🔗 INTERMEDIATE LAYERS: Follow the square progression
+        # Each layer compresses information: 784→625→484→361→256→169→100→64→36→16→9→4→1
         for i in range(len(layer_dims) - 1):
             self.layers.append(nn.Linear(layer_dims[i], layer_dims[i + 1]))
         
-        # Activations for each layer
+        # ⚡ ACTIVATION FUNCTIONS - Adding Non-Linearity to Neural Networks
+        # ReLU for intermediate layers (fast, simple), Tanh for final layer (bounded output)
         self.activations = nn.ModuleList([
             nn.ReLU() if i < len(layer_dims) - 1 else nn.Tanh() 
             for i in range(len(layer_dims))
         ])
         
+        # 🚫 DROPOUT LAYER - Prevents Overfitting
+        # Randomly sets some neurons to zero during training (like temporary brain fog)
         self.dropout = nn.Dropout(config.deep_layers_config['dropout'])
         
-        # Layer normalization for each square dimension
+        # 📊 LAYER NORMALIZATION - Keeps Values Well-Behaved
+        # Normalizes inputs to each layer (prevents gradient explosion/vanishing)
         self.layer_norms = nn.ModuleList([
             nn.LayerNorm(dim) for dim in layer_dims
         ])
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through square progression layers"""
-        # Ensure proper input dimension
-        if x.dim() == 1:
-            x = x.unsqueeze(0)
+        """
+        🔄 FORWARD PASS - The Thinking Process (Novice Guide)
         
-        # Handle input dimension mismatch
+        This is where the magic happens! The input goes through each layer,
+        getting processed and compressed until we have a final representation.
+        
+        🧠 THINK OF IT LIKE:
+        Raw Thought (784D) → Organized Ideas (625D) → Key Concepts (484D) → 
+        Core Understanding (361D) → ... → Final Essence (1D)
+        
+        Args:
+            x: Input tensor (the "thought" to process)
+            
+        Returns:
+            Processed tensor (the "understanding" we've extracted)
+        """
+        # 📏 ENSURE PROPER INPUT DIMENSIONS
+        if x.dim() == 1:  # If input is 1D, make it 2D (add batch dimension)
+            x = x.unsqueeze(0)  # [784] → [1, 784]
+        
+        # 🔧 HANDLE INPUT DIMENSION MISMATCHES - Graceful error handling
         if x.shape[-1] != self.input_dim:
             if x.shape[-1] < self.input_dim:
-                # Pad with zeros
+                # 📈 PAD WITH ZEROS - Make input bigger if too small
                 padding = torch.zeros(x.shape[:-1] + (self.input_dim - x.shape[-1],))
                 x = torch.cat([x, padding], dim=-1)
             else:
-                # Truncate
+                # ✂️ TRUNCATE - Make input smaller if too big
                 x = x[..., :self.input_dim]
         
-        # Forward pass through square progression
+        # 🚀 THE MAIN FORWARD PASS - Layer by layer processing
         for i, (layer, activation, norm) in enumerate(zip(self.layers, self.activations, self.layer_norms)):
-            x = layer(x)
-            x = norm(x)  # Apply layer normalization
+            x = layer(x)         # Linear transformation (matrix multiplication + bias)
+            x = norm(x)          # Normalize values (keeps them well-behaved)
             
-            if i < len(self.layers) - 1:  # No dropout on final layer
-                x = self.dropout(x)
+            if i < len(self.layers) - 1:  # Don't apply dropout to the final layer
+                x = self.dropout(x)  # Randomly zero some neurons (training only)
             
-            x = activation(x)
+            x = activation(x)    # Apply non-linearity (ReLU or Tanh)
         
-        return x
+        return x  # Return the final processed "understanding"
 
 class SOMClustering:
     """Self-Organizing Map for heat map clustering with square input dimension"""
