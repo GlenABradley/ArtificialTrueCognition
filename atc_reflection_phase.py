@@ -208,13 +208,20 @@ class MetaCognitionEngine:
         strategy_input[3] = meta_analysis['meta_confidence']
         
         # Add improvement direction with proper dimension handling
-        improvement_direction = meta_analysis.get('improvement_direction', [0.0] * 16)
-        if len(improvement_direction) >= 12:
-            improvement_vector = torch.tensor(improvement_direction[:12], dtype=torch.float32)
+        improvement_direction = meta_analysis.get('improvement_direction', [0.0] * 4)
+        # improvement_direction is 4D from meta_reasoning_output[12:16]
+        # We need to expand it to 12D for strategy_input[4:16]
+        if len(improvement_direction) == 4:
+            # Expand 4D to 12D by repeating the pattern
+            expanded_direction = improvement_direction * 3  # Repeat 3 times to get 12 elements
+            improvement_vector = torch.tensor(expanded_direction, dtype=torch.float32)
         else:
-            # Pad to 12 dimensions
-            padded_direction = list(improvement_direction) + [0.0] * (12 - len(improvement_direction))
-            improvement_vector = torch.tensor(padded_direction, dtype=torch.float32)
+            # Fallback: pad or truncate to 12 dimensions
+            if len(improvement_direction) >= 12:
+                improvement_vector = torch.tensor(improvement_direction[:12], dtype=torch.float32)
+            else:
+                padded_direction = list(improvement_direction) + [0.0] * (12 - len(improvement_direction))
+                improvement_vector = torch.tensor(padded_direction, dtype=torch.float32)
         
         strategy_input[4:16] = improvement_vector
         
