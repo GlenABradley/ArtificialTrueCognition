@@ -35,8 +35,8 @@ from sklearn.metrics import accuracy_score, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Import our Core SATC Engine (unified architecture)
-from core_satc_engine import EnhancedSATCEngine, CoreSATCConfig
+# Import our Enhanced SATC Engine (current architecture)
+from enhanced_satc_engine import EnhancedSATCEngine, SATCConfig
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -208,7 +208,7 @@ class SATCTrainer:
         
         # Initialize components
         self.tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
-        self.satc_engine = EnhancedSATCEngine(CoreSATCConfig())
+        self.satc_engine = EnhancedSATCEngine(SATCConfig())
         
         # Training components
         self.optimizer = None
