@@ -538,38 +538,123 @@ class HDSpaceEncoder:
         nn.init.xavier_uniform_(self.decoder.weight)  # Decoder weights
         
     def encode(self, nodes: torch.Tensor) -> torch.Tensor:
-        """Encode nodes to HD space"""
-        # Ensure input has correct dimensions
-        if nodes.dim() == 1:
-            nodes = nodes.unsqueeze(0)
+        """
+        🚀 ENCODE TO HYPER-DIMENSIONAL SPACE (Novice Guide)
         
-        # Adjust input dimension if needed
+        This is where we take simple 1D representations and explode them into
+        incredibly rich 10,000-dimensional semantic spaces!
+        
+        🎨 THINK OF IT LIKE:
+        - Taking a simple sketch (1D) and turning it into a detailed painting (10,000D)
+        - Each new dimension adds a subtle new way to represent meaning
+        - Like going from black & white TV to full-spectrum color with infinite hues
+        
+        🔬 TECHNICAL PROCESS:
+        1. Take input nodes (usually 1D from deep layer compression)
+        2. Expand through linear transformation (matrix multiplication)
+        3. Normalize the result (preserve HD vector properties)
+        4. Return rich 10,000D semantic representations
+        
+        Args:
+            nodes: Input tensor nodes to encode (1D representations)
+            
+        Returns:
+            hd_vectors: Rich 10,000D hyper-dimensional representations
+        """
+        # 📏 ENSURE PROPER INPUT DIMENSIONS
+        if nodes.dim() == 1:  # If 1D input, add batch dimension
+            nodes = nodes.unsqueeze(0)  # [1] → [1, 1]
+        
+        # 🔧 HANDLE INPUT DIMENSION MISMATCHES - Graceful compatibility
         if nodes.shape[-1] != self.input_dim:
             if nodes.shape[-1] < self.input_dim:
-                # Pad with zeros
+                # 📈 PAD WITH ZEROS - Extend if too small
                 padding = torch.zeros(nodes.shape[:-1] + (self.input_dim - nodes.shape[-1],))
                 nodes = torch.cat([nodes, padding], dim=-1)
             else:
-                # Truncate or compress
+                # ✂️ TRUNCATE - Shorten if too big
                 nodes = nodes[..., :self.input_dim]
         
-        hd_vectors = self.encoder(nodes)
-        # Normalize for HD vector properties
+        # 🚀 MAIN ENCODING TRANSFORMATION - 1D → 10,000D expansion!
+        hd_vectors = self.encoder(nodes)  # Linear transformation (matrix multiplication)
+        
+        # 🔄 NORMALIZE FOR HD VECTOR PROPERTIES - Preserve mathematical properties
+        # HD vectors work best when normalized (unit length)
         hd_vectors = hd_vectors / torch.norm(hd_vectors, dim=-1, keepdim=True)
-        return hd_vectors
+        
+        return hd_vectors  # Return the rich semantic representations!
     
     def decode(self, hd_vectors: torch.Tensor) -> torch.Tensor:
-        """Decode HD vectors back to node space"""
-        return self.decoder(hd_vectors)
+        """
+        🔽 DECODE FROM HYPER-DIMENSIONAL SPACE (Novice Guide)
+        
+        The reverse process - take rich 10,000D representations and compress
+        them back down to simple 1D representations.
+        
+        🎨 THINK OF IT LIKE:
+        - Taking a detailed painting (10,000D) and creating a simple sketch (1D)
+        - Extracting the "essence" from all that rich semantic information
+        - Like creating a summary from a long, detailed book
+        
+        Args:
+            hd_vectors: Rich 10,000D hyper-dimensional representations
+            
+        Returns:
+            Simple 1D node representations (compressed essence)
+        """
+        return self.decoder(hd_vectors)  # Linear transformation: 10,000D → 1D
     
     def bind(self, vec1: torch.Tensor, vec2: torch.Tensor) -> torch.Tensor:
-        """HD binding operation (XOR)"""
-        return torch.logical_xor(vec1 > 0, vec2 > 0).float()
+        """
+        🔗 HD BINDING OPERATION - Combining Concepts (Novice Guide)
+        
+        In hyper-dimensional computing, "binding" combines two concepts together
+        to create a new concept that contains both.
+        
+        🧠 REAL-WORLD ANALOGY:
+        - Like combining "red" + "car" = "red car"
+        - The result is similar to neither input, but contains both
+        - XOR operation creates this magical combination property
+        
+        🔬 WHY XOR?
+        - XOR is its own inverse: bind(bind(A,B),B) = A
+        - Creates distributed representations
+        - Works beautifully in high dimensions
+        
+        Args:
+            vec1: First HD vector concept
+            vec2: Second HD vector concept
+            
+        Returns:
+            Combined HD vector containing both concepts
+        """
+        return torch.logical_xor(vec1 > 0, vec2 > 0).float()  # XOR binding operation
     
     def bundle(self, vectors: List[torch.Tensor]) -> torch.Tensor:
-        """HD bundling operation (addition + normalize)"""
-        bundled = torch.stack(vectors).sum(dim=0)
-        return bundled / torch.norm(bundled)
+        """
+        📦 HD BUNDLING OPERATION - Superposing Multiple Concepts (Novice Guide)
+        
+        "Bundling" in HD computing is like mixing paint colors - you add multiple
+        concepts together to create a composite representation.
+        
+        🎨 REAL-WORLD ANALOGY:
+        - Like mixing red + blue + yellow paint to get a new color
+        - The result is similar to ALL inputs (unlike binding)
+        - Addition followed by normalization preserves HD properties
+        
+        🔬 MATHEMATICAL PROCESS:
+        1. Stack all vectors together
+        2. Add them element-wise (superposition)
+        3. Normalize the result (preserve unit length)
+        
+        Args:
+            vectors: List of HD vectors to bundle together
+            
+        Returns:
+            Bundled HD vector containing all input concepts
+        """
+        bundled = torch.stack(vectors).sum(dim=0)      # Add all vectors together
+        return bundled / torch.norm(bundled)          # Normalize to unit length
 
 class SememeDatabase:
     """HowNet/WordNet Sememe Database Integration"""
