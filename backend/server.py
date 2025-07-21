@@ -89,6 +89,18 @@ class CognitionResponse(BaseModel):
     method: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     metadata: Dict[str, Any] = Field(default_factory=dict)
+    
+    # ATC Phase Data
+    meta_coherence: float = None
+    self_awareness: float = None
+    reflection_insights: List[str] = Field(default_factory=list)
+    goal_count: int = None
+    decision_confidence: float = None
+    dominant_value: str = None
+    consciousness_level: float = None
+    identity_id: str = None
+    identity_coherence: float = None
+    total_memories: int = None
 
 class PerformanceMetrics(BaseModel):
     total_queries: int
