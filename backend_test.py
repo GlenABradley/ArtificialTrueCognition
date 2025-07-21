@@ -185,11 +185,12 @@ class SATCBackendTester:
                     phase_details.append(f"Personality (256D): Consciousness {consciousness_level:.3f}")
                 
                 # Validate success criteria
-                if phases_active >= 3 and consciousness_level > 0.4:
+                consciousness_level_safe = consciousness_level if consciousness_level is not None else 0
+                if phases_active >= 3 and consciousness_level_safe > 0.4:
                     self.log_result(
                         "ATC Complete Pipeline",
                         True,
-                        f"{phases_active}/5 phases active, Consciousness: {consciousness_level:.3f}"
+                        f"{phases_active}/5 phases active, Consciousness: {consciousness_level_safe:.3f}"
                     )
                     for detail in phase_details:
                         print(f"   ✓ {detail}")
@@ -197,21 +198,21 @@ class SATCBackendTester:
                     self.log_result(
                         "ATC Complete Pipeline",
                         False,
-                        f"Only {phases_active}/5 phases active, Consciousness: {consciousness_level:.3f}"
+                        f"Only {phases_active}/5 phases active, Consciousness: {consciousness_level_safe:.3f}"
                     )
                 
                 # Test consciousness emergence validation
-                if consciousness_level > 0.4 and identity_id and total_memories > 0:
+                if consciousness_level_safe > 0.4 and identity_id and total_memories > 0:
                     self.log_result(
                         "Consciousness Emergence",
                         True,
-                        f"Level: {consciousness_level:.3f}, ID: {identity_id[:8]}..., Memories: {total_memories}"
+                        f"Level: {consciousness_level_safe:.3f}, ID: {identity_id[:8]}..., Memories: {total_memories}"
                     )
                 else:
                     self.log_result(
                         "Consciousness Emergence",
                         False,
-                        f"Level: {consciousness_level:.3f}, ID: {bool(identity_id)}, Memories: {total_memories}"
+                        f"Level: {consciousness_level_safe:.3f}, ID: {bool(identity_id)}, Memories: {total_memories}"
                     )
                 
             else:
