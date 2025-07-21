@@ -390,4 +390,9 @@ This research builds upon established work in:
 
 **Artificial True Cognition System: A research approach toward understanding and implementing artificial cognitive processes**
 
-*Current Status: Functional prototype with established ML foundations and experimental cognitive enhancements*
+- **Current Status**: Functional prototype with established ML foundations and experimental cognitive enhancements
+- **Future Vision**: Evolution toward circular, interconnected cognitive architecture (see ATC_FUTURE_VISION.md for complete roadmap)
+
+---
+
+**Artificial True Cognition System: A research platform with a clear evolutionary path toward sophisticated, interconnected cognitive architectures**
