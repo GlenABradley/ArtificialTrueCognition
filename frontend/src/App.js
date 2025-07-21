@@ -580,10 +580,10 @@ const Home = () => {
             onClick={() => setShowCognition(true)}
             className="cta-button"
           >
-            🚀 Launch SATC Interface
+            🚀 Launch Research Interface
           </button>
           <p className="cta-description">
-            Experience true artificial cognition in action
+            Interact with the ATC research prototype
           </p>
         </div>
       </header>
