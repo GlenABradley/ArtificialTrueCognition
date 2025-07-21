@@ -703,6 +703,10 @@ class EnhancedSATCEngine:
         # Test 16D Reflection phase integration
         if self.using_reflection_16d:
             self._test_reflection_16d_integration()
+            
+        # Test 64D Volition phase integration
+        if self.using_volition_64d:
+            self._test_volition_64d_integration()
     
     def _test_power_of_2_integration(self):
         """Test Power-of-2 integration on engine initialization"""
