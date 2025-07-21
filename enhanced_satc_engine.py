@@ -730,6 +730,25 @@ class EnhancedSATCEngine:
             logger.error(f"❌ Recognition phase integration failed: {str(e)}")
             self.using_recognition_phase = False
     
+    def _test_cognition_4d_integration(self):
+        """Test 4D Cognition phase integration on engine initialization"""
+        logger.info("Testing 4D Cognition phase integration...")
+        
+        try:
+            # Test 4D cognition with sample query
+            test_embedding = torch.randn(8)  # 8D test embedding
+            result = self.cognition_processor.cognize(test_embedding, "test cognition query")
+            
+            if result['success']:
+                logger.info("✅ 4D Cognition phase integration successful!")
+                logger.info(f"✅ Cognition test: coherence={result['coherence']:.3f}, steps={result['reasoning_steps']}")
+            else:
+                logger.warning(f"⚠️  4D Cognition test: FAILED - {result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"❌ 4D Cognition phase integration failed: {str(e)}")
+            self.using_cognition_4d = False
+    
     def process_query(self, query: str) -> Dict[str, Any]:
         """
         Revolutionary ATC Query Processing Pipeline
