@@ -689,6 +689,34 @@ class EnhancedSATCEngine:
             logger.error(f"❌ Power-of-2 integration failed: {str(e)}")
             self.using_power_of_2 = False
     
+    def _test_recognition_integration(self):
+        """Test Recognition phase integration on engine initialization"""
+        logger.info("Testing Recognition phase integration...")
+        
+        try:
+            # Test recognition with sample queries
+            test_queries = ["hello", "test query", "sample input"]
+            
+            for query in test_queries:
+                result = self.recognition_processor.recognize(query, self.embedding_model)
+                logger.debug(f"Recognition test '{query}': {result['match_found']}")
+            
+            # Test learning capability
+            self.recognition_processor.learn_pattern("test pattern", "test_response", self.embedding_model)
+            
+            # Test recognition of learned pattern
+            learned_result = self.recognition_processor.recognize("test pattern", self.embedding_model)
+            
+            if learned_result['match_found']:
+                logger.info("✅ Recognition phase integration successful!")
+                logger.info(f"✅ Pattern learning test: PASSED (similarity: {learned_result['similarity']:.3f})")
+            else:
+                logger.warning(f"⚠️  Pattern learning test: FAILED")
+                
+        except Exception as e:
+            logger.error(f"❌ Recognition phase integration failed: {str(e)}")
+            self.using_recognition_phase = False
+    
     def process_query(self, query: str) -> Dict[str, Any]:
         """
         Main query processing pipeline
