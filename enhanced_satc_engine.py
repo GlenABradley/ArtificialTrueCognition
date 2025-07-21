@@ -187,63 +187,62 @@ class SATCConfig:
     performance_targets: Dict = field(default_factory=lambda: {
         'recognition_threshold': 0.7,  # Similarity threshold for pattern recognition
         'coherence_threshold': 0.5,    # Minimum coherence for output acceptance
-        'max_latency_ms': 500,         # Maximum thinking time (0.5 seconds)
-        'target_power_w': 1.0          # Target power consumption (1 watt)
+        'max_latency_ms': 500,         # Target maximum processing time (milliseconds)
+        'target_power_w': 1.0          # Target power consumption (watts) - not actively monitored
     })
 
 class DeepLayers(nn.Module):
     """
-    🧠 DEEP NEURAL NETWORK LAYERS - The Core Thinking Engine (Novice Guide)
+    Multi-Layer Neural Network with Square Dimensional Progression
     
-    🎓 WHAT IS THIS CLASS?
-    This is like the "deep thinking" part of our AI brain. Think of it as multiple
-    layers of neurons stacked on top of each other, like the layers in your brain's
-    cortex. Each layer processes information and passes it to the next layer.
+    IMPLEMENTATION STATUS: FULLY IMPLEMENTED
     
-    🔍 WHY "SQUARE PROGRESSION"?
-    We use perfect square numbers (784→625→484→361...) because:
-    - They have beautiful mathematical properties
-    - They compress information in a structured way
-    - The pattern mimics how human brains compress complex ideas into simpler concepts
+    Architecture:
+    - Sequential linear transformations through perfect square dimensions
+    - Layer normalization and dropout regularization
+    - Progressive dimensional reduction: 784 → 625 → 484 → ... → 1
+    - ReLU activation for intermediate layers, Tanh for final layer
     
-    🏗️ ARCHITECTURE EXPLANATION:
-    Input (784 dimensions) → First Layer (625) → Second Layer (484) → ... → Final Layer (1)
+    Technical Details:
+    - Input: Variable dimension tensors (automatically padded/truncated to 784)
+    - Output: Single scalar value (1D final representation)
+    - Layers: Configurable number of sequential transformations
+    - Regularization: Dropout applied to all non-final layers
+    - Normalization: Layer normalization applied to each transformation
     
-    Each layer:
-    1. Takes input from previous layer
-    2. Applies linear transformation (matrix multiplication)
-    3. Normalizes the result (layer normalization)
-    4. Adds dropout for regularization (prevents overfitting)  
-    5. Applies activation function (ReLU or Tanh)
+    Mathematical Foundation:
+    The square progression provides mathematically convenient dimensional
+    reductions with clean factorization properties. Each dimension d²
+    allows reshape operations and maintains numerical stability.
     
-    🧬 INHERITANCE: nn.Module
-    - This means DeepLayers IS a PyTorch neural network component
-    - We inherit all the power of PyTorch's automatic gradient computation
-    - Can be trained with backpropagation automatically
+    Implementation Notes:
+    - Graceful handling of dimension mismatches via padding/truncation
+    - Automatic batch dimension management
+    - Standard PyTorch nn.Module inheritance for gradient computation
     """
     
     def __init__(self, config: SATCConfig, input_dim: int = 784):
         """
-        🏗️ CONSTRUCTOR - Building the Deep Thinking Network
+        Initialize deep neural network layers with square progression.
         
         Args:
-            config: Configuration object with all the brain settings
-            input_dim: How many dimensions the input has (default 784 = 28²)
+            config: System configuration containing layer specifications
+            input_dim: Input tensor dimensionality (default: 784 = 28²)
         """
-        super().__init__()  # Initialize parent nn.Module class
+        super().__init__()
         self.config = config
         self.input_dim = input_dim
         
-        # 📐 Use the beautiful square progression from config
-        layer_dims = config.layer_squares  # [784, 625, 484, 361, 256, 169, 100, 64, 36, 16, 9, 4, 1]
+        # Extract square dimensional progression from configuration
+        layer_dims = config.layer_squares  # [784, 625, 484, ..., 1]
         
-        # 🏗️ BUILD NEURAL NETWORK LAYERS - Like stacking brain layers
-        self.layers = nn.ModuleList()  # Container to hold all our neural network layers
+        # Build sequential linear transformation layers
+        self.layers = nn.ModuleList()
         
-        # 🚪 FIRST LAYER: input_dim → first square dimension
+        # First layer: input_dim → first square dimension
         self.layers.append(nn.Linear(input_dim, layer_dims[0]))
         
-        # 🔗 INTERMEDIATE LAYERS: Follow the square progression
+        # Intermediate layers: follow square progression
         # Each layer compresses information: 784→625→484→361→256→169→100→64→36→16→9→4→1
         for i in range(len(layer_dims) - 1):
             self.layers.append(nn.Linear(layer_dims[i], layer_dims[i + 1]))
