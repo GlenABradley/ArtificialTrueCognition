@@ -1312,8 +1312,8 @@ class EnhancedSATCEngine:
         positions = np.column_stack([flat_indices[0], flat_indices[1]])
         values = heat_map.flatten()
         
-        # Combine position and value for clustering
-        features = np.column_stack([positions, values.reshape(-1, 1)])
+        # Combine position and value for clustering - fix dimension mismatch
+        features = np.column_stack([positions, values])  # Remove reshape to avoid dimension mismatch
         
         # DBSCAN clustering
         clustering = DBSCAN(
