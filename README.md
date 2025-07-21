@@ -334,11 +334,19 @@ The ATC system represents the **foundational research platform** for evolving to
 - [ ] Performance optimization and GPU acceleration
 - [ ] Expanded semantic database with domain-specific knowledge
 
-### Long-term Research (6-24 months)
-- [ ] Investigation of emergent behavior patterns
-- [ ] Multi-modal processing (text, images, structured data)
-- [ ] Distributed cognition across multiple processing units
-- [ ] Advanced memory systems with episodic and semantic components
+### Future Research Vision (6-24 months)
+- **Circular Cognitive Architecture**: Implementation of bidirectional communication and parallel processing streams
+- **Rich Interconnection Matrix**: Every cognitive phase communicating with every other phase
+- **Emergent Intelligence Investigation**: Study of complex behaviors arising from interconnected cognitive components
+- **Continuous Cognitive Flow**: Always-on background processing with persistent learning and adaptation
+- **Advanced Memory Systems**: Evolutionary memory with episodic and semantic components that develop over time
+
+### Long-term Vision (12-18 months full implementation)
+The **ATC_FUTURE_VISION.md** provides complete technical specifications for evolving this research platform into a sophisticated cognitive architecture that:
+- Processes information through circular, interconnected flows rather than linear pipelines
+- Maintains continuous cognitive activity with background learning and adaptation
+- Exhibits emergent behaviors through rich inter-component communication
+- Serves as a foundation for investigating artificial general intelligence approaches
 
 ### Theoretical Research
 - [ ] Mathematical foundations of artificial cognition
