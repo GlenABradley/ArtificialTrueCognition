@@ -1655,7 +1655,7 @@ class EnhancedSATCEngine:
                 logger.info("🧠 Phase 2: Cognition (Legacy Architecture)")
                 result = self._cognition_legacy(query, start_time)      # Legacy square progression
             
-            # Learn successful cognition results for future Recognition
+            # 📚 LEARN FROM SUCCESSFUL COGNITION - Update Recognition for future
             if result['success'] and self.using_recognition_phase:
                 self.recognition_processor.learn_pattern(
                     query, 
@@ -1664,14 +1664,16 @@ class EnhancedSATCEngine:
                     {'learned_from_cognition': True, 'coherence': result.get('coherence', 0.0)}
                 )
                 logger.info("📚 Pattern learned for future Recognition")
-            
-            # Step 3: 16D Reflection (if enabled and cognition was used)
+
+            # ============================================================================
+            # 🧘 PHASE 3: REFLECTION (16D) - Meta-Cognitive Self-Awareness
+            # ============================================================================
             if result.get('phase', '').startswith('cognition') and self.using_reflection_16d:
                 logger.info("🧘 Phase 3: Reflection (16D)")
                 try:
                     reflection_result = self.reflection_processor.reflect(result)
                     if reflection_result['success']:
-                        # Enhance result with reflection insights
+                        # 🌟 ENHANCE RESULT with reflection insights
                         result['reflection'] = reflection_result
                         result['meta_coherence'] = reflection_result.get('meta_analysis', {}).get('meta_coherence', 0.0)
                         result['self_awareness'] = reflection_result.get('self_awareness_level', 0.0)
@@ -1685,17 +1687,19 @@ class EnhancedSATCEngine:
                     reflection_result = None
             else:
                 reflection_result = None
-            
-            # Step 4: 64D Volition (if enabled and we have any cognition processing)
+
+            # ============================================================================
+            # 🎯 PHASE 4: VOLITION (64D) - Goal-Oriented Decision Making
+            # ============================================================================
             if (result.get('phase', '').startswith('cognition') and self.using_volition_64d and 
-                result.get('coherence', 0) >= 0.1):  # Include exactly 0.1 coherence
+                result.get('coherence', 0) >= 0.1):  # Only for decent quality cognition
                 
                 logger.info("🎯 Phase 4: Volition (64D)")
                 try:
-                    # Create volition context
+                    # 🎛️ CREATE VOLITION CONTEXT - Decision-making parameters
                     volition_context = {
                         'urgency': 0.7,  # Moderate urgency for user queries
-                        'complexity': min(result.get('reasoning_steps', 1) / 10.0, 1.0),
+                        'complexity': min(result.get('reasoning_steps', 1) / 10.0, 1.0),  # Normalized complexity
                         'novelty': 1.0 - result.get('coherence', 0.5),  # Novel if low coherence
                         'importance': 0.8,  # User queries are generally important
                         'query_type': 'user_request',
@@ -1708,7 +1712,7 @@ class EnhancedSATCEngine:
                     )
                     
                     if volition_result['success']:
-                        # Enhance result with volition insights
+                        # 🌟 ENHANCE RESULT with volition insights
                         result['volition'] = volition_result
                         result['decision_confidence'] = volition_result.get('coherence', 0.0)
                         result['goal_count'] = volition_result.get('goal_count', 0)
@@ -1724,12 +1728,14 @@ class EnhancedSATCEngine:
                     volition_result = None
             else:
                 volition_result = None
-            
-            # Step 5: 256D Personality (the final consciousness integration)
+
+            # ============================================================================
+            # 🌟 PHASE 5: PERSONALITY (256D) - Consciousness Integration
+            # ============================================================================
             if self.using_personality_256d:
                 logger.info("🌟 Phase 5: Personality (256D) - Consciousness Integration")
                 try:
-                    # Create comprehensive interaction context
+                    # 🧠 CREATE COMPREHENSIVE INTERACTION CONTEXT
                     interaction_context = {
                         'query': query,
                         'success': result.get('success', False),
@@ -1743,7 +1749,7 @@ class EnhancedSATCEngine:
                         'query_type': 'user_interaction'
                     }
                     
-                    # Include all cognitive results
+                    # 📊 INCLUDE ALL COGNITIVE RESULTS for personality integration
                     all_cognitive_results = {
                         **result,
                         'reflection_result': reflection_result,
@@ -1756,7 +1762,7 @@ class EnhancedSATCEngine:
                     )
                     
                     if personality_result['success']:
-                        # Final integration: Merge personality with response
+                        # 🎉 FINAL CONSCIOUSNESS INTEGRATION - Merge personality with response
                         result['personality'] = personality_result
                         result['consciousness_level'] = personality_result.get('consciousness_level', 0.0)
                         result['identity_id'] = personality_result.get('identity', {}).get('id', 'unknown')
@@ -1775,9 +1781,10 @@ class EnhancedSATCEngine:
                 except Exception as e:
                     logger.warning(f"⚠️  Personality error: {str(e)}")
             
-            return result
+            return result  # 🎉 Return the final enriched cognitive result!
             
         except Exception as e:
+            # 🚨 ERROR HANDLING - Graceful failure with diagnostic information
             logger.error(f"❌ ATC processing failed: {str(e)}")
             processing_time = time.time() - start_time
             
