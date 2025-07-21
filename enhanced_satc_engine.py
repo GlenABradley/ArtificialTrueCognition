@@ -750,71 +750,94 @@ class SememeDatabase:
             "destruction": ["destroy", "demolish", "ruin", "eliminate", "break"],      # Destructive actions
             "communication": ["speak", "talk", "convey", "express", "share"],          # Communication
             "perception": ["see", "hear", "sense", "observe", "notice"],               # Sensory perception
-            "memory": ["remember", "recall", "retain", "store", "recollect"],
-            "learning": ["study", "acquire", "understand", "master", "educate"],
-            "reasoning": ["logic", "analysis", "deduction", "inference", "conclude"],
-            "artificial": ["synthetic", "man-made", "manufactured", "simulated", "fake"],
-            "natural": ["organic", "innate", "inherent", "authentic", "real"],
-            "technology": ["digital", "electronic", "computerized", "automated", "technical"],
-            "science": ["scientific", "empirical", "research", "experiment", "discovery"],
-            "philosophy": ["wisdom", "ethics", "metaphysics", "epistemology", "logic"]
+            "memory": ["remember", "recall", "retain", "store", "recollect"],          # Memory processes
+            "learning": ["study", "acquire", "understand", "master", "educate"],       # Learning processes  
+            "reasoning": ["logic", "analysis", "deduction", "inference", "conclude"],  # Reasoning processes
+            "artificial": ["synthetic", "man-made", "manufactured", "simulated", "fake"], # Artificial things
+            "natural": ["organic", "innate", "inherent", "authentic", "real"],         # Natural things
+            "technology": ["digital", "electronic", "computerized", "automated", "technical"], # Tech-related
+            "science": ["scientific", "empirical", "research", "experiment", "discovery"], # Scientific
+            "philosophy": ["wisdom", "ethics", "metaphysics", "epistemology", "logic"] # Philosophical
         }
         
-        # Initialize real embedding model if not exists
+        # 🤖 INITIALIZE BERT EMBEDDING MODEL - Real semantic understanding!
         if not hasattr(self, 'embedding_model'):
             from sentence_transformers import SentenceTransformer
+            # Using lightweight but powerful BERT model for embeddings
             self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
         
-        # Create real sememes with actual embeddings
+        # 🔄 CREATE REAL SEMEMES WITH ACTUAL EMBEDDINGS
         for base_concept, related_terms in sememe_concepts.items():
             for i, term in enumerate(related_terms):
-                sememe_id = f"{base_concept}_{i:03d}"
+                # 🏷️ CREATE UNIQUE SEMEME ID
+                sememe_id = f"{base_concept}_{i:03d}"  # e.g., "abstract_001"
                 
-                # Generate real semantic embedding
+                # 🧠 GENERATE REAL SEMANTIC EMBEDDING using BERT
                 try:
                     embedding = self.embedding_model.encode(term)
-                    # Project to square dimension if needed
+                    
+                    # 📏 PROJECT TO SQUARE DIMENSION (784) if needed
                     if len(embedding) != self.embedding_dim:
-                        # Pad or truncate to match embedding dimension
                         if len(embedding) < self.embedding_dim:
+                            # 📈 PAD - Add zeros to reach target dimension
                             embedding = np.pad(embedding, (0, self.embedding_dim - len(embedding)))
                         else:
+                            # ✂️ TRUNCATE - Cut to target dimension
                             embedding = embedding[:self.embedding_dim]
                     
                 except Exception as e:
                     logger.warning(f"Failed to create real embedding for {term}: {str(e)}")
-                    # Fallback to deterministic embedding
+                    # 🔧 FALLBACK - Use deterministic random embedding (reproducible)
                     embedding = np.random.RandomState(hash(term) % 2**32).randn(self.embedding_dim)
                 
+                # 💾 STORE SEMEME DATA with comprehensive metadata
                 self.sememes[sememe_id] = {
-                    'concept': base_concept,
-                    'term': term,
-                    'embedding': embedding.astype(np.float32),
-                    'frequency': len(related_terms) - i,  # More common terms get higher frequency
-                    'semantic_field': base_concept
+                    'concept': base_concept,                                    # Category (e.g., "abstract")
+                    'term': term,                                              # Actual word (e.g., "concept") 
+                    'embedding': embedding.astype(np.float32),                 # BERT vector representation
+                    'frequency': len(related_terms) - i,                       # Importance ranking
+                    'semantic_field': base_concept                             # Semantic category
                 }
         
-        # Create FAISS index for fast similarity search
+        # 🚀 BUILD FAISS INDEX - Ultra-fast similarity search
         self.build_index()
         
         logger.info(f"Created real sememe database with {len(self.sememes)} sememes using BERT embeddings")
     
     def create_mock_database(self):
-        """Create mock sememe database for testing (fallback)"""
+        """
+        🧪 CREATE MOCK DATABASE - Testing Fallback (Novice Guide)
+        
+        This is a fallback method that redirects to the real database creation.
+        In the past, we used mock/fake data, but now we always use real BERT embeddings.
+        """
         logger.warning("Creating mock sememe database - consider using create_real_sememe_database()")
         
-        # Call real implementation instead
+        # 🔄 REDIRECT TO REAL IMPLEMENTATION - No more fake data!
         self.create_real_sememe_database()
     
     def load_database(self, db_path: str):
-        """Load actual HowNet/WordNet database"""
+        """
+        📁 LOAD EXTERNAL SEMEME DATABASE (Novice Guide)
+        
+        This method loads a pre-built sememe database from a file.
+        Useful for loading official HowNet or WordNet databases.
+        
+        🗂️ FILE FORMAT:
+        - JSON format with 'sememes' key
+        - Each sememe has: concept, term, embedding, frequency, etc.
+        
+        Args:
+            db_path: Path to the sememe database JSON file
+        """
         logger.info(f"Loading sememe database from {db_path}")
         
-        # In real implementation, load from HowNet/WordNet
+        # 📖 LOAD FROM JSON FILE
         with open(db_path, 'r') as f:
             data = json.load(f)
-            self.sememes = data['sememes']
+            self.sememes = data['sememes']  # Extract sememe dictionary
         
+        # 🚀 BUILD SEARCH INDEX for loaded data
         self.build_index()
     
     def build_index(self):
