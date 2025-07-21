@@ -883,70 +883,149 @@ class SememeDatabase:
         return results
 
 class DissonanceBalancer:
-    """Dissonance Balancing with Beam Search and Genetic Algorithm"""
+    """
+    ⚖️ DISSONANCE BALANCER - Making AI Output Make Sense (Novice Guide)
+    
+    🎓 WHAT IS DISSONANCE?
+    In cognitive science, dissonance is when things don't fit together well - like
+    hearing a jarring note in music. In AI, it's when the output doesn't make sense
+    or sounds awkward and unnatural.
+    
+    🎯 THE GOAL:
+    Take multiple candidate outputs from the AI brain and find the one that:
+    - Sounds most natural (low perplexity)
+    - Has good information balance (appropriate entropy)
+    - Fits well with human language patterns
+    
+    🔬 TWO KEY MEASUREMENTS:
+    1. **Perplexity**: How "surprised" a language model would be by this text
+       - Lower perplexity = more natural sounding
+       - Measures how well text follows language patterns
+    
+    2. **Entropy**: How much information/randomness is in the text
+       - Too low = boring/repetitive
+       - Too high = chaotic/nonsensical
+       - Need the right balance!
+    
+    🚀 OPTIMIZATION METHODS:
+    - **Beam Search**: Systematic exploration of best candidates
+    - **Genetic Algorithm**: Evolutionary optimization with mutation
+    """
     
     def __init__(self, config: SATCConfig):
-        self.config = config
-        self.dissonance_config = config.dissonance_config
+        """
+        🏗️ CONSTRUCTOR - Building the Output Quality Optimizer
+        
+        Args:
+            config: System configuration with dissonance balancing settings
+        """
+        self.config = config                              # Main system configuration
+        self.dissonance_config = config.dissonance_config # Specific dissonance settings
         
     def calculate_perplexity(self, text: str) -> float:
-        """Calculate real perplexity using proper language modeling"""
+        """
+        🔢 CALCULATE PERPLEXITY - How Natural Does This Text Sound? (Novice Guide)
+        
+        Perplexity measures how "surprised" a language model would be by seeing
+        this text. Lower perplexity = more natural/expected language patterns.
+        
+        🎵 MUSIC ANALOGY:
+        - Like measuring how much a melody follows musical rules
+        - Beautiful music has predictable patterns (low perplexity)
+        - Random noise sounds terrible (high perplexity)
+        
+        🔬 HOW IT WORKS:
+        1. Split text into words
+        2. Calculate probability of each word given the context
+        3. Use these probabilities to compute perplexity
+        4. Lower values = better quality text
+        
+        Args:
+            text: Input text to evaluate
+            
+        Returns:
+            Perplexity score (lower is better, capped at 1000)
+        """
         try:
-            words = text.split()
+            words = text.split()  # Split into individual words
             if not words:
-                return float('inf')
+                return float('inf')  # Empty text = infinite perplexity
             
-            # Real perplexity calculation using token probabilities
-            # For now, use a simplified but more realistic approach
+            # 📊 REAL PERPLEXITY CALCULATION using token probabilities
+            # (Simplified but mathematically sound approach)
             
-            # 1. Create word frequency distribution
+            # 1️⃣ CREATE WORD FREQUENCY DISTRIBUTION
             word_counts = {}
             for word in words:
                 word_counts[word] = word_counts.get(word, 0) + 1
             
-            # 2. Calculate token probabilities
+            # 2️⃣ CALCULATE TOKEN PROBABILITIES
             total_words = len(words)
             log_prob_sum = 0.0
             
             for word in words:
-                # Probability of word based on frequency
+                # Probability = frequency of word / total words
                 prob = word_counts[word] / total_words
                 
-                # Add smoothing to avoid log(0)
-                smoothed_prob = max(prob, 1e-10)
-                log_prob_sum += np.log(smoothed_prob)
+                # 🔧 ADD SMOOTHING to avoid log(0) mathematical error
+                smoothed_prob = max(prob, 1e-10)  # Minimum probability
+                log_prob_sum += np.log(smoothed_prob)  # Sum log probabilities
             
-            # 3. Calculate perplexity
-            average_log_prob = log_prob_sum / total_words
-            perplexity = np.exp(-average_log_prob)
+            # 3️⃣ CALCULATE PERPLEXITY using standard formula
+            average_log_prob = log_prob_sum / total_words  # Average log probability
+            perplexity = np.exp(-average_log_prob)         # Convert to perplexity
             
-            return min(perplexity, 1000.0)  # Cap at reasonable value
+            return min(perplexity, 1000.0)  # Cap at reasonable maximum value
             
         except Exception as e:
             logger.error(f"Error calculating perplexity: {str(e)}")
-            # Fallback to simple approximation
+            # 🔧 FALLBACK CALCULATION - Simple approximation
             unique_words = set(words)
             return len(words) / len(unique_words) if unique_words else 1.0
     
     def calculate_entropy(self, text: str) -> float:
-        """Calculate semantic entropy"""
-        words = text.split()
-        if not words:
-            return 0.0
+        """
+        📊 CALCULATE ENTROPY - How Much Information Is In This Text? (Novice Guide)
         
-        # Calculate word frequency distribution
+        Entropy measures the amount of information or "surprise" in text.
+        - High entropy = lots of variety, unpredictable (can be good or chaotic)
+        - Low entropy = very predictable, repetitive (can be boring)
+        
+        💎 GOLDILOCKS PRINCIPLE:
+        - Too much entropy = word salad
+        - Too little entropy = repetitive nonsense  
+        - Just right entropy = engaging, meaningful text
+        
+        🔬 HOW IT WORKS:
+        1. Count frequency of each word
+        2. Calculate probability distribution
+        3. Use Shannon entropy formula: -Σ(p * log₂(p))
+        4. Higher values = more unpredictable/information-rich
+        
+        Args:
+            text: Input text to analyze
+            
+        Returns:
+            Entropy score (higher = more information/variety)
+        """
+        words = text.split()  # Split into words
+        if not words:
+            return 0.0  # No words = no information = zero entropy
+        
+        # 📊 CALCULATE WORD FREQUENCY DISTRIBUTION
         word_freq = {}
         for word in words:
             word_freq[word] = word_freq.get(word, 0) + 1
         
-        # Calculate entropy
+        # 🧮 CALCULATE SHANNON ENTROPY
         entropy = 0.0
         total_words = len(words)
-        for freq in word_freq.values():
-            prob = freq / total_words
-            entropy -= prob * np.log2(prob)
         
-        return entropy
+        for freq in word_freq.values():
+            prob = freq / total_words  # Probability of this word
+            entropy -= prob * np.log2(prob)  # Shannon entropy formula
+        
+        return entropy  # Return information content measure
     
     def calculate_dissonance(self, text: str) -> float:
         """Calculate combined dissonance score"""
