@@ -686,7 +686,8 @@ class EnhancedSATCEngine:
             'recognition_phase_active': self.using_recognition_phase,  # Track Recognition phase
             'cognition_4d_active': self.using_cognition_4d,  # Track 4D Cognition phase
             'reflection_16d_active': self.using_reflection_16d,  # Track 16D Reflection phase
-            'volition_64d_active': self.using_volition_64d  # Track 64D Volition phase
+            'volition_64d_active': self.using_volition_64d,  # Track 64D Volition phase
+            'personality_256d_active': self.using_personality_256d  # Track 256D Personality phase
         }
         
         # Training data for SOM
