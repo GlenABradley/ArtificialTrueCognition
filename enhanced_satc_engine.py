@@ -690,6 +690,10 @@ class EnhancedSATCEngine:
         # Test 4D Cognition phase integration
         if self.using_cognition_4d:
             self._test_cognition_4d_integration()
+            
+        # Test 16D Reflection phase integration
+        if self.using_reflection_16d:
+            self._test_reflection_16d_integration()
     
     def _test_power_of_2_integration(self):
         """Test Power-of-2 integration on engine initialization"""
