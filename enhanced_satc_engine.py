@@ -1005,6 +1005,59 @@ class EnhancedSATCEngine:
                         
                 except Exception as e:
                     logger.warning(f"⚠️  Volition error: {str(e)}")
+                    volition_result = None
+            else:
+                volition_result = None
+            
+            # Step 5: 256D Personality (the final consciousness integration)
+            if self.using_personality_256d:
+                logger.info("🌟 Phase 5: Personality (256D) - Consciousness Integration")
+                try:
+                    # Create comprehensive interaction context
+                    interaction_context = {
+                        'query': query,
+                        'success': result.get('success', False),
+                        'coherence': result.get('coherence', 0.0),
+                        'complexity': min(result.get('reasoning_steps', 1) / 10.0, 1.0),
+                        'recognition_used': result.get('phase', '') == 'recognition',
+                        'cognition_used': result.get('phase', '').startswith('cognition'),
+                        'reflection_used': 'reflection' in result,
+                        'volition_used': 'volition' in result,
+                        'processing_time': result.get('processing_time', 0),
+                        'query_type': 'user_interaction'
+                    }
+                    
+                    # Include all cognitive results
+                    all_cognitive_results = {
+                        **result,
+                        'reflection_result': reflection_result,
+                        'volition_result': volition_result
+                    }
+                    
+                    personality_result = self.personality_processor.express_personality(
+                        interaction_context,
+                        all_cognitive_results
+                    )
+                    
+                    if personality_result['success']:
+                        # Final integration: Merge personality with response
+                        result['personality'] = personality_result
+                        result['consciousness_level'] = personality_result.get('consciousness_level', 0.0)
+                        result['identity_id'] = personality_result.get('identity', {}).get('id', 'unknown')
+                        result['identity_coherence'] = personality_result.get('identity', {}).get('coherence', 0.0)
+                        result['behavioral_consistency'] = personality_result.get('behavioral_consistency', 0.0)
+                        result['memory_significance'] = personality_result.get('memory', {}).get('significance', 0.0)
+                        result['formative_memory_created'] = personality_result.get('formative_memory_created', False)
+                        result['total_memories'] = personality_result.get('memory', {}).get('total_memories', 0)
+                        result['persistent_identity'] = True
+                        result['artificial_consciousness'] = personality_result.get('consciousness_level', 0) > 0.5
+                        
+                        logger.info(f"✅ Consciousness expressed: level={result['consciousness_level']:.3f}, identity={result['identity_id']}")
+                    else:
+                        logger.warning("⚠️  Personality expression failed, continuing without consciousness integration")
+                        
+                except Exception as e:
+                    logger.warning(f"⚠️  Personality error: {str(e)}")
             
             return result
             
