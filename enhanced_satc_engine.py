@@ -243,69 +243,74 @@ class DeepLayers(nn.Module):
         self.layers.append(nn.Linear(input_dim, layer_dims[0]))
         
         # Intermediate layers: follow square progression
-        # Each layer compresses information: 784→625→484→361→256→169→100→64→36→16→9→4→1
+        # Each transformation reduces dimensionality: 784→625→484→...→1
         for i in range(len(layer_dims) - 1):
             self.layers.append(nn.Linear(layer_dims[i], layer_dims[i + 1]))
         
-        # ⚡ ACTIVATION FUNCTIONS - Adding Non-Linearity to Neural Networks
-        # ReLU for intermediate layers (fast, simple), Tanh for final layer (bounded output)
+        # Activation functions for non-linear transformations
+        # ReLU for intermediate layers (computational efficiency)
+        # Tanh for final layer (bounded output in [-1, 1])
         self.activations = nn.ModuleList([
             nn.ReLU() if i < len(layer_dims) - 1 else nn.Tanh() 
             for i in range(len(layer_dims))
         ])
         
-        # 🚫 DROPOUT LAYER - Prevents Overfitting
-        # Randomly sets some neurons to zero during training (like temporary brain fog)
+        # Dropout for regularization (prevents overfitting)
+        # Randomly zeros neurons during training with configured probability
         self.dropout = nn.Dropout(config.deep_layers_config['dropout'])
         
-        # 📊 LAYER NORMALIZATION - Keeps Values Well-Behaved
-        # Normalizes inputs to each layer (prevents gradient explosion/vanishing)
+        # Layer normalization for training stability
+        # Normalizes inputs to each layer to prevent gradient explosion/vanishing
         self.layer_norms = nn.ModuleList([
             nn.LayerNorm(dim) for dim in layer_dims
         ])
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        🔄 FORWARD PASS - The Thinking Process (Novice Guide)
+        Forward pass through sequential neural network layers.
         
-        This is where the magic happens! The input goes through each layer,
-        getting processed and compressed until we have a final representation.
-        
-        🧠 THINK OF IT LIKE:
-        Raw Thought (784D) → Organized Ideas (625D) → Key Concepts (484D) → 
-        Core Understanding (361D) → ... → Final Essence (1D)
+        Process:
+        1. Ensure proper input dimensions (add batch dimension if needed)
+        2. Handle dimension mismatches via padding or truncation  
+        3. Apply sequential transformations: Linear → LayerNorm → Dropout → Activation
+        4. Return final scalar representation
         
         Args:
-            x: Input tensor (the "thought" to process)
+            x: Input tensor (any compatible dimensionality)
             
         Returns:
-            Processed tensor (the "understanding" we've extracted)
+            torch.Tensor: Final processed representation (scalar output)
+            
+        Implementation Notes:
+        - Automatic dimension handling prevents runtime errors
+        - Graceful degradation for incompatible inputs
+        - Standard PyTorch computational graph for backpropagation
         """
-        # 📏 ENSURE PROPER INPUT DIMENSIONS
-        if x.dim() == 1:  # If input is 1D, make it 2D (add batch dimension)
-            x = x.unsqueeze(0)  # [784] → [1, 784]
+        # Ensure proper batch dimensionality
+        if x.dim() == 1:
+            x = x.unsqueeze(0)  # Add batch dimension: [D] → [1, D]
         
-        # 🔧 HANDLE INPUT DIMENSION MISMATCHES - Graceful error handling
+        # Handle input dimension compatibility
         if x.shape[-1] != self.input_dim:
             if x.shape[-1] < self.input_dim:
-                # 📈 PAD WITH ZEROS - Make input bigger if too small
+                # Pad with zeros to reach target dimension
                 padding = torch.zeros(x.shape[:-1] + (self.input_dim - x.shape[-1],))
                 x = torch.cat([x, padding], dim=-1)
             else:
-                # ✂️ TRUNCATE - Make input smaller if too big
+                # Truncate to target dimension
                 x = x[..., :self.input_dim]
         
-        # 🚀 THE MAIN FORWARD PASS - Layer by layer processing
+        # Sequential forward pass through all layers
         for i, (layer, activation, norm) in enumerate(zip(self.layers, self.activations, self.layer_norms)):
-            x = layer(x)         # Linear transformation (matrix multiplication + bias)
-            x = norm(x)          # Normalize values (keeps them well-behaved)
+            x = layer(x)         # Linear transformation
+            x = norm(x)          # Layer normalization
             
-            if i < len(self.layers) - 1:  # Don't apply dropout to the final layer
-                x = self.dropout(x)  # Randomly zero some neurons (training only)
+            if i < len(self.layers) - 1:  # Skip dropout on final layer
+                x = self.dropout(x)  # Regularization
             
-            x = activation(x)    # Apply non-linearity (ReLU or Tanh)
+            x = activation(x)    # Non-linear activation
         
-        return x  # Return the final processed "understanding"
+        return x  # Return processed tensor
 
 class SOMClustering:
     """
