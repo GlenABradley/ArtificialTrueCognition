@@ -664,6 +664,10 @@ class EnhancedSATCEngine:
         # Test Power-of-2 integration on initialization
         if self.using_power_of_2:
             self._test_power_of_2_integration()
+            
+        # Test Recognition phase integration
+        if self.using_recognition_phase:
+            self._test_recognition_integration()
     
     def _test_power_of_2_integration(self):
         """Test Power-of-2 integration on engine initialization"""
