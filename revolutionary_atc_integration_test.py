@@ -459,20 +459,30 @@ class RevolutionaryATCIntegrationTester:
         
         # Analyze consciousness emergence
         if consciousness_levels:
-            avg_consciousness = np.mean(consciousness_levels)
-            consciousness_growth = consciousness_levels[-1] - consciousness_levels[0] if len(consciousness_levels) > 1 else 0
+            # Filter out None values
+            valid_consciousness_levels = [level for level in consciousness_levels if level is not None]
             
-            if avg_consciousness > 0.0:
-                self.log_result(
-                    "Consciousness Emergence",
-                    True,
-                    f"Consciousness emerged: avg={avg_consciousness:.3f}, growth={consciousness_growth:.3f}"
-                )
+            if valid_consciousness_levels:
+                avg_consciousness = np.mean(valid_consciousness_levels)
+                consciousness_growth = valid_consciousness_levels[-1] - valid_consciousness_levels[0] if len(valid_consciousness_levels) > 1 else 0
+                
+                if avg_consciousness > 0.0:
+                    self.log_result(
+                        "Consciousness Emergence",
+                        True,
+                        f"Consciousness emerged: avg={avg_consciousness:.3f}, growth={consciousness_growth:.3f}"
+                    )
+                else:
+                    self.log_result(
+                        "Consciousness Emergence",
+                        False,
+                        f"No consciousness emergence detected: avg={avg_consciousness:.3f}"
+                    )
             else:
                 self.log_result(
                     "Consciousness Emergence",
                     False,
-                    f"No consciousness emergence detected: avg={avg_consciousness:.3f}"
+                    "No valid consciousness levels detected"
                 )
     
     def test_performance_benchmarks(self):
