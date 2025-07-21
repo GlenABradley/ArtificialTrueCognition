@@ -41,6 +41,8 @@ from atc_recognition_phase import RecognitionProcessor, RecognitionPhaseIntegrat
 from atc_cognition_phase import CognitionProcessor, CognitionPhaseIntegrator, create_cognition_phase
 # Import ATC 16D Reflection Phase
 from atc_reflection_phase import ReflectionProcessor, ReflectionPhaseIntegrator, create_reflection_phase
+# Import ATC 64D Volition Phase
+from atc_volition_phase import VolitionProcessor, VolitionPhaseIntegrator, create_volition_phase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
