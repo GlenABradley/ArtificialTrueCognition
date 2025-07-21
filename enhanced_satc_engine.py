@@ -1028,67 +1028,137 @@ class DissonanceBalancer:
         return entropy  # Return information content measure
     
     def calculate_dissonance(self, text: str) -> float:
-        """Calculate combined dissonance score"""
-        perplexity = self.calculate_perplexity(text)
-        entropy = self.calculate_entropy(text)
+        """
+        🎯 CALCULATE COMBINED DISSONANCE SCORE (Novice Guide)
         
-        # Weighted combination
+        This combines both perplexity and entropy into a single "quality score"
+        that tells us how good/natural a piece of text is.
+        
+        🧮 THE FORMULA:
+        Dissonance = (Perplexity × Weight₁) + (Entropy × Weight₂)
+        
+        🎛️ WEIGHTED COMBINATION:
+        - Perplexity Weight: 0.6 (60% importance) - How natural it sounds
+        - Entropy Weight: 0.4 (40% importance) - Information balance
+        - Lower dissonance = better quality text
+        
+        Args:
+            text: Text to evaluate for overall quality
+            
+        Returns:
+            Combined dissonance score (lower is better)
+        """
+        perplexity = self.calculate_perplexity(text)  # How unnatural it sounds
+        entropy = self.calculate_entropy(text)        # Information content
+        
+        # 🧮 WEIGHTED COMBINATION using configuration values
         dissonance = (self.dissonance_config['perplexity_weight'] * perplexity + 
                      self.dissonance_config['entropy_weight'] * entropy)
         
-        return dissonance
+        return dissonance  # Lower = better quality
     
     def beam_search(self, variants: List[str]) -> Tuple[str, float]:
-        """Beam search for optimal variant"""
-        if not variants:
-            return "", float('inf')
+        """
+        🔍 BEAM SEARCH OPTIMIZATION - Finding the Best Output (Novice Guide)
         
-        # Calculate dissonance for all variants
+        Beam search is a systematic way to find the best candidate from multiple options.
+        Think of it like taste-testing different dishes to find the most delicious one.
+        
+        🎯 HOW IT WORKS:
+        1. Take all candidate text variants
+        2. Calculate dissonance (quality score) for each one
+        3. Sort them from best to worst (lowest dissonance first)
+        4. Return the winner!
+        
+        🏆 WHY "BEAM" SEARCH?
+        - Like shining a beam of light to illuminate the best path
+        - Systematic evaluation of all possibilities
+        - Guaranteed to find the best option from available candidates
+        
+        Args:
+            variants: List of candidate text outputs to choose from
+            
+        Returns:
+            Tuple of (best_text, lowest_dissonance_score)
+        """
+        if not variants:  # Handle empty input
+            return "", float('inf')  # No variants = infinite dissonance
+        
+        # 📊 CALCULATE DISSONANCE FOR ALL VARIANTS
         scored_variants = []
         for variant in variants:
-            dissonance = self.calculate_dissonance(variant)
-            scored_variants.append((variant, dissonance))
+            dissonance = self.calculate_dissonance(variant)  # Get quality score
+            scored_variants.append((variant, dissonance))    # Store text + score
         
-        # Sort by dissonance (lower is better)
-        scored_variants.sort(key=lambda x: x[1])
+        # 🏆 SORT BY DISSONANCE (lower = better quality)
+        scored_variants.sort(key=lambda x: x[1])  # Sort by dissonance score
         
-        # Return best variant
-        return scored_variants[0]
+        # 🎯 RETURN THE WINNER (lowest dissonance = best quality)
+        return scored_variants[0]  # Return (best_text, best_score)
     
     def genetic_algorithm(self, variants: List[str], generations: int = 10) -> Tuple[str, float]:
-        """Genetic algorithm optimization"""
-        population = variants.copy()
+        """
+        🧬 GENETIC ALGORITHM OPTIMIZATION - Evolution-Based Improvement (Novice Guide)
         
+        This uses principles of biological evolution to improve text quality!
+        Just like how species evolve to become better adapted to their environment.
+        
+        🌱 THE EVOLUTIONARY PROCESS:
+        1. **Population**: Start with candidate text variants
+        2. **Fitness**: Measure how "good" each variant is (inverse dissonance)
+        3. **Selection**: Choose the best variants to "reproduce"  
+        4. **Mutation**: Randomly modify some variants for diversity
+        5. **Repeat**: Do this for many generations
+        6. **Survival**: The fittest variants survive and improve!
+        
+        🔬 WHY USE EVOLUTION?
+        - Can find solutions that simple search might miss
+        - Introduces creative mutations that might improve quality
+        - Mimics natural optimization processes
+        - Great for exploring creative variations
+        
+        Args:
+            variants: Initial population of text candidates
+            generations: How many evolutionary cycles to run (default 10)
+            
+        Returns:
+            Tuple of (evolved_best_text, final_dissonance_score)
+        """
+        population = variants.copy()  # Start with initial population
+        
+        # 🔄 EVOLUTION LOOP - Run for specified generations
         for generation in range(generations):
-            # Evaluate fitness (inverse dissonance)
+            # 💪 EVALUATE FITNESS - How good is each variant?
             fitness_scores = []
             for variant in population:
                 dissonance = self.calculate_dissonance(variant)
+                # Convert dissonance to fitness (higher fitness = better)
                 fitness_scores.append(1.0 / (1.0 + dissonance))
             
-            # Selection (tournament)
+            # 🏆 SELECTION - Choose the best variants for reproduction
             new_population = []
             for _ in range(len(population)):
-                # Tournament selection
+                # 🥊 TOURNAMENT SELECTION - Competition between 3 random candidates
                 candidates = np.random.choice(len(population), 3, replace=False)
+                # Winner = highest fitness score
                 best_candidate = max(candidates, key=lambda i: fitness_scores[i])
                 new_population.append(population[best_candidate])
             
-            # Mutation (simplified)
+            # 🧬 MUTATION - Random changes for genetic diversity
             for i in range(len(new_population)):
-                if np.random.random() < 0.1:  # 10% mutation rate
+                if np.random.random() < 0.1:  # 10% mutation chance
                     variant = new_population[i]
                     words = variant.split()
                     if words:
-                        # Random word substitution
+                        # 🎲 RANDOM WORD SUBSTITUTION mutation
                         idx = np.random.randint(len(words))
-                        words[idx] = f"mutated_{words[idx]}"
+                        words[idx] = f"mutated_{words[idx]}"  # Mutate one word
                         new_population[i] = " ".join(words)
             
-            population = new_population
+            population = new_population  # New generation becomes current population
         
-        # Return best from final population
-        return self.beam_search(population)
+        # 🏁 RETURN THE BEST FROM FINAL GENERATION
+        return self.beam_search(population)  # Use beam search on final population
 
 class EnhancedSATCEngine:
     """
