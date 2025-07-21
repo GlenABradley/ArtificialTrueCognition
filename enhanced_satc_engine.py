@@ -657,47 +657,99 @@ class HDSpaceEncoder:
         return bundled / torch.norm(bundled)          # Normalize to unit length
 
 class SememeDatabase:
-    """HowNet/WordNet Sememe Database Integration"""
+    """
+    📚 SEMEME DATABASE - The Brain's Semantic Memory (Novice Guide)
+    
+    🎓 WHAT ARE SEMEMES?
+    Sememes are the smallest units of meaning in language - like atoms of meaning!
+    They're the basic building blocks that combine to form complex concepts.
+    
+    🧠 REAL-WORLD ANALOGY:
+    - Think of LEGO blocks - each block is a sememe
+    - You combine basic blocks to build complex structures (words/concepts)
+    - "Human" might be built from sememes: [animate] + [intelligent] + [bipedal]
+    
+    📖 HOWNET/WORDNET INTEGRATION:
+    - HowNet: Chinese semantic knowledge base
+    - WordNet: English semantic network
+    - Both provide structured meaning representations
+    - We use BERT embeddings to capture semantic relationships
+    
+    🔍 SEMANTIC SEARCH:
+    - Uses FAISS (Facebook AI Similarity Search) for ultra-fast lookup
+    - Can find semantically similar concepts in milliseconds
+    - Powers the AI's understanding of word meanings and relationships
+    
+    🎯 ATC INTEGRATION:
+    - Provides semantic grounding for abstract thinking
+    - Enables the system to understand what words actually mean
+    - Bridges the gap between symbols and meaning
+    """
     
     def __init__(self, db_path: Optional[str] = None):
-        """Initialize sememe database"""
-        self.sememes = {}
-        self.index = None
-        self.embeddings = None
-        self.sememe_ids = []
-        self.embedding_dim = 784  # Square embedding dimension
+        """
+        🏗️ CONSTRUCTOR - Building the Semantic Memory System
         
+        Args:
+            db_path: Optional path to pre-built sememe database file
+        """
+        # 📚 CORE DATA STRUCTURES
+        self.sememes = {}           # Dictionary storing all sememe data
+        self.index = None           # FAISS index for fast similarity search
+        self.embeddings = None      # NumPy array of all embeddings
+        self.sememe_ids = []        # List of sememe identifiers
+        self.embedding_dim = 784    # Embedding dimension (28² perfect square)
+        
+        # 🔄 INITIALIZE DATABASE - Load existing or create new
         if db_path and Path(db_path).exists():
-            self.load_database(db_path)
+            self.load_database(db_path)      # Load from file
         else:
-            self.create_real_sememe_database()
+            self.create_real_sememe_database()  # Create fresh database
     
     def create_real_sememe_database(self):
-        """Create real sememe database with proper semantic embeddings"""
+        """
+        🏗️ CREATE REAL SEMANTIC DATABASE (Novice Guide)
+        
+        This method creates a comprehensive semantic database using real BERT embeddings
+        instead of random numbers. Each sememe gets a meaningful vector representation.
+        
+        🧠 WHY BERT EMBEDDINGS?
+        - BERT understands context and meaning
+        - Creates vectors where similar concepts are close together
+        - Much better than random numbers for semantic understanding
+        
+        🎯 SEMANTIC CATEGORIES:
+        We organize knowledge into fundamental categories like:
+        - Abstract vs Concrete (ideas vs physical things)
+        - Animate vs Inanimate (living vs non-living)
+        - Positive vs Negative (good vs bad)
+        - Active vs Passive (dynamic vs static)
+        """
         logger.info("Creating real sememe database with BERT embeddings")
         
-        # Real semantic concepts (not random)
+        # 🧠 REAL SEMANTIC CONCEPTS - Not random data!
+        # Each category contains related terms that share semantic properties
         sememe_concepts = {
-            "abstract": ["concept", "idea", "thought", "theory", "principle"],
-            "concrete": ["object", "thing", "item", "entity", "physical"],
-            "animate": ["living", "alive", "breathing", "organic", "biological"],
-            "inanimate": ["non-living", "inorganic", "lifeless", "mechanical", "static"],
-            "human": ["person", "individual", "human being", "mankind", "people"],
-            "animal": ["creature", "beast", "organism", "species", "fauna"],
-            "emotion": ["feeling", "sentiment", "mood", "affect", "passion"],
-            "cognition": ["thinking", "reasoning", "intelligence", "understanding", "knowledge"],
-            "physical": ["bodily", "material", "tangible", "corporeal", "solid"],
-            "temporal": ["time", "duration", "sequence", "chronological", "moment"],
-            "spatial": ["location", "position", "place", "dimension", "area"],
-            "causal": ["cause", "effect", "reason", "consequence", "result"],
-            "positive": ["good", "beneficial", "favorable", "constructive", "optimistic"],
-            "negative": ["bad", "harmful", "unfavorable", "destructive", "pessimistic"],
-            "active": ["dynamic", "energetic", "moving", "engaged", "participatory"],
-            "passive": ["static", "inactive", "receptive", "dormant", "idle"],
-            "creation": ["build", "make", "construct", "generate", "produce"],
-            "destruction": ["destroy", "demolish", "ruin", "eliminate", "break"],
-            "communication": ["speak", "talk", "convey", "express", "share"],
-            "perception": ["see", "hear", "sense", "observe", "notice"],
+            "abstract": ["concept", "idea", "thought", "theory", "principle"],           # Mental constructs
+            "concrete": ["object", "thing", "item", "entity", "physical"],              # Physical things
+            "animate": ["living", "alive", "breathing", "organic", "biological"],       # Living beings
+            "inanimate": ["non-living", "inorganic", "lifeless", "mechanical", "static"], # Non-living
+            "human": ["person", "individual", "human being", "mankind", "people"],       # Human-related
+            "animal": ["creature", "beast", "organism", "species", "fauna"],            # Animal-related
+            "emotion": ["feeling", "sentiment", "mood", "affect", "passion"],           # Emotional states
+            "cognition": ["thinking", "reasoning", "intelligence", "understanding", "knowledge"], # Mental processes
+            "physical": ["bodily", "material", "tangible", "corporeal", "solid"],       # Physical properties
+            "temporal": ["time", "duration", "sequence", "chronological", "moment"],    # Time-related
+            "spatial": ["location", "position", "place", "dimension", "area"],          # Space-related
+            "causal": ["cause", "effect", "reason", "consequence", "result"],           # Causation
+            "positive": ["good", "beneficial", "favorable", "constructive", "optimistic"], # Positive valence
+            "negative": ["bad", "harmful", "unfavorable", "destructive", "pessimistic"], # Negative valence
+            "active": ["dynamic", "energetic", "moving", "engaged", "participatory"],   # Active properties
+            "passive": ["static", "inactive", "receptive", "dormant", "idle"],          # Passive properties
+            "creation": ["build", "make", "construct", "generate", "produce"],          # Creative actions
+            "destruction": ["destroy", "demolish", "ruin", "eliminate", "break"],      # Destructive actions
+            "communication": ["speak", "talk", "convey", "express", "share"],          # Communication
+            "perception": ["see", "hear", "sense", "observe", "notice"],               # Sensory perception
             "memory": ["remember", "recall", "retain", "store", "recollect"],
             "learning": ["study", "acquire", "understand", "master", "educate"],
             "reasoning": ["logic", "analysis", "deduction", "inference", "conclude"],
