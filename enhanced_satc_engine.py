@@ -43,6 +43,8 @@ from atc_cognition_phase import CognitionProcessor, CognitionPhaseIntegrator, cr
 from atc_reflection_phase import ReflectionProcessor, ReflectionPhaseIntegrator, create_reflection_phase
 # Import ATC 64D Volition Phase
 from atc_volition_phase import VolitionProcessor, VolitionPhaseIntegrator, create_volition_phase
+# Import ATC 256D Personality Phase
+from atc_personality_phase import PersonalityProcessor, PersonalityPhaseIntegrator, create_personality_phase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
