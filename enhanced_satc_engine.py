@@ -39,6 +39,8 @@ from power_of_2_core import PowerOf2Layers, PowerOf2Config, PowerOf2Integrator, 
 from atc_recognition_phase import RecognitionProcessor, RecognitionPhaseIntegrator, create_recognition_phase
 # Import ATC 4D Cognition Phase
 from atc_cognition_phase import CognitionProcessor, CognitionPhaseIntegrator, create_cognition_phase
+# Import ATC 16D Reflection Phase
+from atc_reflection_phase import ReflectionProcessor, ReflectionPhaseIntegrator, create_reflection_phase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
