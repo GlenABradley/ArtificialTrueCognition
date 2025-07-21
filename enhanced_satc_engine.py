@@ -1283,80 +1283,89 @@ class EnhancedSATCEngine:
             self.using_reflection_16d = False
             self.using_volition_64d = False
             self.using_personality_256d = False
-            # Define consistent square dimensions (legacy)
+            # Define consistent square dimensions for legacy mode
             self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
             self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
             
-        self.hd_dim = self.config.hd_dim  # Hyper-dimensional space
+        # 🌐 HYPER-DIMENSIONAL SPACE SETUP
+        self.hd_dim = self.config.hd_dim  # 10,000D space for rich semantic representations
         
-        # Initialize core components with appropriate dimensions
+        # 🏗️ INITIALIZE CORE COGNITIVE COMPONENTS with appropriate dimensions
         if self.using_power_of_2:
-            # Use Power-of-2 architecture
-            # Keep legacy components for compatibility but prepare for upgrade
-            self.deep_layers = DeepLayers(self.config, input_dim=self.final_dim)
-            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.final_dim)
-            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.final_dim)
+            # 🚀 POWER-OF-2 ARCHITECTURE - Revolutionary dimensional progression
+            # Keep legacy components for compatibility but use new dimensions
+            self.deep_layers = DeepLayers(self.config, input_dim=self.final_dim)  # Neural network stack
+            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.final_dim)  # Spatial memory
+            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.final_dim)  # HD space encoder
         else:
-            # Use legacy square architecture
-            self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)
-            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)
-            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)
+            # 📐 LEGACY SQUARE ARCHITECTURE - Original square progression  
+            self.deep_layers = DeepLayers(self.config, input_dim=self.embedding_dim)  # 784D input
+            self.som_clustering = SOMClustering(self.config.som_grid_size, input_dim=self.structure_dim)  # 1D input
+            self.hd_encoder = HDSpaceEncoder(self.hd_dim, input_dim=self.structure_dim)  # 1D→10,000D
             
-        self.sememe_db = SememeDatabase(sememe_db_path)
+        # 📚 SEMANTIC MEMORY SYSTEM - The brain's knowledge base
+        self.sememe_db = SememeDatabase(sememe_db_path)  # Load semantic database
+        
+        # ⚖️ OUTPUT QUALITY OPTIMIZER - Makes responses make sense
         self.dissonance_balancer = DissonanceBalancer(self.config)
         
-        # Memory and learning components
-        self.replay_buffer = []
-        self.deposited_patterns = None
-        self.deposited_structures = None
-        self.fisher_matrix = {}
-        self.optimal_params = {}
+        # 🧠 MEMORY & LEARNING COMPONENTS - How the brain remembers and learns
+        self.replay_buffer = []            # Stores experiences for learning
+        self.deposited_patterns = None     # Cached input patterns for recognition
+        self.deposited_structures = None   # Cached output structures for quick retrieval
+        self.fisher_matrix = {}            # EWC (prevents catastrophic forgetting)
+        self.optimal_params = {}           # Optimal neural network parameters
         
-        # Optimization
+        # 🎯 OPTIMIZATION SETUP - How the brain learns and improves
         if self.using_power_of_2:
-            # Include Power-of-2 parameters in optimization
+            # Include revolutionary Power-of-2 layers in optimization
             all_params = list(self.deep_layers.parameters()) + list(self.power_layers.parameters())
             self.optimizer = torch.optim.Adam(all_params, lr=1e-3, weight_decay=1e-4)
         else:
+            # Legacy optimization (just deep layers)
             self.optimizer = torch.optim.Adam(
                 self.deep_layers.parameters(),
                 lr=1e-3,
                 weight_decay=1e-4
             )
         
-        # Performance tracking
+        # 📊 PERFORMANCE TRACKING SYSTEM - Comprehensive brain monitoring
         self.performance_metrics = {
-            'recognition_hits': 0,
-            'cognition_processes': 0,
-            'coherence_scores': [],
-            'dissonance_values': [],
-            'processing_times': [],
-            'memory_updates': 0,
-            'total_queries': 0,
-            'power_of_2_active': self.using_power_of_2,  # Track architecture type
-            'recognition_phase_active': self.using_recognition_phase,  # Track Recognition phase
-            'cognition_4d_active': self.using_cognition_4d,  # Track 4D Cognition phase
-            'reflection_16d_active': self.using_reflection_16d,  # Track 16D Reflection phase
-            'volition_64d_active': self.using_volition_64d,  # Track 64D Volition phase
-            'personality_256d_active': self.using_personality_256d  # Track 256D Personality phase
+            'recognition_hits': 0,              # How many times Recognition phase was used
+            'cognition_processes': 0,           # How many times Cognition phase was used
+            'coherence_scores': [],             # Quality scores over time
+            'dissonance_values': [],            # Output quality measurements
+            'processing_times': [],             # How fast the brain thinks
+            'memory_updates': 0,                # How many times memory was updated
+            'total_queries': 0,                 # Total number of questions processed
+            
+            # 🚀 ATC PHASE ACTIVITY TRACKING
+            'power_of_2_active': self.using_power_of_2,                  # Revolutionary architecture enabled?
+            'recognition_phase_active': self.using_recognition_phase,    # 2D Recognition enabled?
+            'cognition_4d_active': self.using_cognition_4d,             # 4D Cognition enabled?
+            'reflection_16d_active': self.using_reflection_16d,         # 16D Reflection enabled?
+            'volition_64d_active': self.using_volition_64d,             # 64D Volition enabled?
+            'personality_256d_active': self.using_personality_256d       # 256D Personality enabled?
         }
         
-        # Training data for SOM
-        self.som_training_data = []
+        # 📈 TRAINING DATA STORAGE for Self-Organizing Map
+        self.som_training_data = []  # Collects data samples for SOM training
         
+        # 📋 LOG INITIALIZATION SUMMARY
         architecture_type = "Power-of-2 Revolutionary" if self.using_power_of_2 else "Legacy Square"
         logger.info(f"Enhanced SATC Engine initialized with {architecture_type} architecture")
         logger.info(f"Dimensions: embedding={self.embedding_dim}, final={getattr(self, 'final_dim', self.structure_dim)}, HD={self.hd_dim}")
         
-        # Test Power-of-2 integration on initialization
+        # 🧪 INTEGRATION TESTING - Verify all systems work correctly
+        # Test Power-of-2 mathematical foundation
         if self.using_power_of_2:
             self._test_power_of_2_integration()
             
-        # Test Recognition phase integration
+        # Test Recognition phase (fast pattern matching)
         if self.using_recognition_phase:
             self._test_recognition_integration()
             
-        # Test 4D Cognition phase integration
+        # Test 4D Cognition phase (deep analytical thinking)
         if self.using_cognition_4d:
             self._test_cognition_4d_integration()
             
