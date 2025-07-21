@@ -345,7 +345,7 @@ const CognitionInterface = () => {
           <textarea
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Enter your query for the SATC cognition engine..."
+            placeholder="Enter your query for the ATC research system..."
             className="query-input"
             rows={3}
             disabled={isProcessing}
