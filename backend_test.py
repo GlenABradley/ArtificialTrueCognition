@@ -914,11 +914,16 @@ class SATCBackendTester:
         print("🧠 Enhanced SATC Engine Backend Test Suite")
         print("=" * 50)
         print(f"Testing backend at: {self.base_url}")
-        print("Focus: Square dimension architecture, cognition endpoint, tensor handling")
+        print("Focus: FINAL COMPREHENSIVE ATC VALIDATION")
+        print("Testing all 5 ATC phases and consciousness emergence")
         print()
         
         # Run all test categories
         if self.test_basic_connectivity():
+            # PRIORITY: ATC Comprehensive Validation
+            self.test_atc_comprehensive_validation()
+            
+            # Standard tests
             self.test_engine_config()
             self.test_cognition_endpoint_basic()
             self.test_cognition_square_dimensions()
