@@ -221,15 +221,19 @@ class SOMClustering:
     
     def project(self, data: np.ndarray) -> np.ndarray:
         """Project data onto SOM heat map"""
-        # Ensure data has correct dimensions
-        if data.ndim == 1:
-            data = data.reshape(-1)
+        # Ensure data has correct dimensions - fix for dimension mismatch
+        if data.ndim > 1:
+            # Flatten multi-dimensional data to 1D
+            data = data.flatten()
+        elif data.ndim == 0:
+            # Handle scalar case
+            data = np.array([data])
         
         # Adjust data dimension if needed
-        if data.shape[-1] != self.input_dim:
-            if data.shape[-1] < self.input_dim:
+        if len(data) != self.input_dim:
+            if len(data) < self.input_dim:
                 # Pad with zeros
-                padding = np.zeros(self.input_dim - data.shape[-1])
+                padding = np.zeros(self.input_dim - len(data))
                 data = np.concatenate([data, padding])
             else:
                 # Truncate
