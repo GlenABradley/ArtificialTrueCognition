@@ -27,7 +27,7 @@ from typing import Dict, Any, List
 import numpy as np
 
 # Backend URL from environment
-BACKEND_URL = "https://0d0327f1-b3e8-4760-9b4f-e767b10bd743.preview.emergentagent.com/api"
+BACKEND_URL = "https://c8c0d672-ab64-4087-91d6-26286b84320a.preview.emergentagent.com/api"
 
 class RevolutionaryATCIntegrationTester:
     """Comprehensive integration testing for Revolutionary ATC system"""
