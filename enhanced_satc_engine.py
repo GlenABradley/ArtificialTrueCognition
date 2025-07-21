@@ -716,6 +716,10 @@ class EnhancedSATCEngine:
         # Test 64D Volition phase integration
         if self.using_volition_64d:
             self._test_volition_64d_integration()
+            
+        # Test 256D Personality phase integration
+        if self.using_personality_256d:
+            self._test_personality_256d_integration()
     
     def _test_power_of_2_integration(self):
         """Test Power-of-2 integration on engine initialization"""
