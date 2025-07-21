@@ -289,16 +289,25 @@ async def get_sememes_for_query(query: str):
     try:
         # Get intent vector
         intent_vector = satc_engine.embed_query(query)
+        logger.info(f"Intent vector shape: {intent_vector.shape}")
         
         # Get structure
         structure = satc_engine.deep_layers(intent_vector)
+        logger.info(f"Structure shape: {structure.shape}")
         
         # Get nodes
-        heat_map = satc_engine.som_clustering.project(structure.detach().cpu().numpy())
+        structure_np = structure.detach().cpu().numpy()
+        logger.info(f"Structure numpy shape: {structure_np.shape}")
+        
+        heat_map = satc_engine.som_clustering.project(structure_np)
+        logger.info(f"Heat map shape: {heat_map.shape}")
+        
         nodes = satc_engine.dynamic_cluster(heat_map)
+        logger.info(f"Nodes shape: {nodes.shape}")
         
         # Get HD nodes
         hd_nodes = satc_engine.hd_encoder.encode(nodes)
+        logger.info(f"HD nodes shape: {hd_nodes.shape}")
         
         # Get sememes
         sememes_raw = satc_engine.sememe_population(hd_nodes)
@@ -336,6 +345,10 @@ async def get_sememes_for_query(query: str):
             "structure_mean": float(torch.mean(structure))
         }
     except Exception as e:
+        logger.error(f"Sememe extraction error: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=f"Failed to get sememes: {str(e)}")
 
 # Training Endpoints
