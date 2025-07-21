@@ -318,47 +318,113 @@ class DeepLayers(nn.Module):
         return x  # Return the final processed "understanding"
 
 class SOMClustering:
-    """Self-Organizing Map for heat map clustering with square input dimension"""
+    """
+    🗺️ SELF-ORGANIZING MAP (SOM) - Spatial Brain Organization (Novice Guide)
     
-    def __init__(self, grid_size: int = 10, input_dim: int = 1):  # Updated to match final square (1²)
-        self.grid_size = grid_size
-        self.input_dim = input_dim
+    🎓 WHAT IS A SELF-ORGANIZING MAP?
+    Imagine your brain organizing memories spatially - similar memories cluster together
+    in nearby locations. That's exactly what a SOM does! It creates a 2D "map" where
+    similar concepts are placed close to each other.
+    
+    🧠 REAL-WORLD ANALOGY:
+    Think of organizing a library - you put similar books near each other on shelves.
+    A SOM does this automatically for data, creating "neighborhoods" of similar information.
+    
+    🔬 HOW IT WORKS:
+    1. Start with a grid of neurons (like a city grid)
+    2. Each neuron has "weights" (what it responds to)
+    3. For each data point, find the "best matching neuron"
+    4. Update that neuron and its neighbors to be more similar to the data
+    5. Over time, the map self-organizes into meaningful clusters!
+    
+    🏗️ TECHNICAL DETAILS:
+    - Grid Size: 10x10 = 100 neurons in our "brain map"
+    - Input Dimension: Usually 1 (final compressed representation from DeepLayers)
+    - Learning: Uses Kohonen's algorithm (competitive learning)
+    - Output: Heat map showing activation patterns
+    """
+    
+    def __init__(self, grid_size: int = 10, input_dim: int = 1):
+        """
+        🏗️ CONSTRUCTOR - Building the Self-Organizing Brain Map
+        
+        Args:
+            grid_size: Size of the neuron grid (10 = 10x10 = 100 neurons)
+            input_dim: Dimensions of input data (1 = final square dimension)
+        """
+        self.grid_size = grid_size      # How big our neural map is (10x10 grid)
+        self.input_dim = input_dim      # How many features each data point has
+        
+        # 🧠 INITIALIZE NEURON WEIGHTS - Each neuron starts with random "preferences"
+        # Shape: [grid_height, grid_width, input_features]
         self.weights = np.random.randn(grid_size, grid_size, input_dim)
-        self.learning_rate = 0.1
-        self.neighborhood_radius = grid_size // 2
+        
+        # 📚 LEARNING PARAMETERS - How fast the brain learns and adapts
+        self.learning_rate = 0.1                    # How quickly neurons adapt (10% change per step)
+        self.neighborhood_radius = grid_size // 2   # How far influence spreads (5 neurons radius)
         
     def train(self, data: np.ndarray, epochs: int = 100):
-        """Train SOM with Kohonen algorithm"""
-        # Ensure data has correct dimensions
-        if data.ndim == 1:
-            data = data.reshape(1, -1)
+        """
+        🎓 TRAINING THE SELF-ORGANIZING MAP (Novice Guide)
         
-        # Adjust data dimension if needed
+        This is where the magic happens! We show the SOM lots of data examples,
+        and it learns to organize itself spatially based on the patterns it sees.
+        
+        🔄 THE TRAINING PROCESS:
+        1. Show a data sample to all neurons
+        2. Find which neuron responds best (Best Matching Unit - BMU)
+        3. Make that neuron AND its neighbors more similar to the data
+        4. Repeat for all data samples
+        5. Do this many times (epochs) until the map stabilizes
+        
+        🧠 WHY IT WORKS:
+        - Competitive learning: Neurons compete to respond to each data point
+        - Cooperative learning: Winning neuron helps its neighbors learn too
+        - Adaptive learning: Learning gets more focused over time
+        
+        Args:
+            data: Training data samples (numpy array)
+            epochs: How many times to go through all the data (100 iterations)
+        """
+        # 📏 ENSURE DATA HAS PROPER DIMENSIONS - Handle different input formats
+        if data.ndim == 1:  # If data is 1D, reshape to 2D
+            data = data.reshape(1, -1)  # [N] → [1, N]
+        
+        # 🔧 HANDLE DIMENSION MISMATCHES - Make data compatible with our neuron weights
         if data.shape[-1] != self.input_dim:
             if data.shape[-1] < self.input_dim:
-                # Pad with zeros
+                # 📈 PAD WITH ZEROS - Make data bigger if too small
                 padding = np.zeros((data.shape[0], self.input_dim - data.shape[-1]))
                 data = np.concatenate([data, padding], axis=-1)
             else:
-                # Truncate
+                # ✂️ TRUNCATE - Make data smaller if too big
                 data = data[..., :self.input_dim]
         
+        # 🎓 MAIN TRAINING LOOP - The learning process
         for epoch in range(epochs):
-            # Decay learning rate and neighborhood radius
-            current_lr = self.learning_rate * (1 - epoch / epochs)
-            current_radius = self.neighborhood_radius * (1 - epoch / epochs)
+            # 📉 DECAY LEARNING PARAMETERS - Learn less aggressively over time
+            current_lr = self.learning_rate * (1 - epoch / epochs)          # Learning rate decreases
+            current_radius = self.neighborhood_radius * (1 - epoch / epochs) # Neighborhood shrinks
             
+            # 🔄 PROCESS EACH DATA SAMPLE
             for sample in data:
-                # Find best matching unit (BMU)
-                distances = np.linalg.norm(self.weights - sample, axis=2)
-                bmu_idx = np.unravel_index(np.argmin(distances), distances.shape)
+                # 🔍 FIND BEST MATCHING UNIT (BMU) - Which neuron responds best?
+                # Calculate distance from sample to each neuron's weights
+                distances = np.linalg.norm(self.weights - sample, axis=2)  # Euclidean distance
+                bmu_idx = np.unravel_index(np.argmin(distances), distances.shape)  # Find minimum
                 
-                # Update weights in neighborhood
-                for i in range(self.grid_size):
-                    for j in range(self.grid_size):
+                # 🤝 UPDATE WEIGHTS IN NEIGHBORHOOD - Cooperative learning
+                for i in range(self.grid_size):      # For each row
+                    for j in range(self.grid_size):  # For each column
+                        # 📏 CALCULATE DISTANCE TO BMU in the grid (not in feature space)
                         distance_to_bmu = np.sqrt((i - bmu_idx[0])**2 + (j - bmu_idx[1])**2)
+                        
+                        # 🎯 UPDATE IF WITHIN NEIGHBORHOOD RADIUS
                         if distance_to_bmu <= current_radius:
+                            # 💫 CALCULATE INFLUENCE (Gaussian decay with distance)
                             influence = np.exp(-distance_to_bmu**2 / (2 * current_radius**2))
+                            
+                            # 🔄 UPDATE NEURON WEIGHTS - Move closer to the sample
                             self.weights[i, j] += current_lr * influence * (sample - self.weights[i, j])
     
     def project(self, data: np.ndarray) -> np.ndarray:
