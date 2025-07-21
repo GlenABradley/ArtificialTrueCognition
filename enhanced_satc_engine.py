@@ -35,6 +35,8 @@ from pathlib import Path
 
 # Import our revolutionary Power-of-2 foundation
 from power_of_2_core import PowerOf2Layers, PowerOf2Config, PowerOf2Integrator, create_power_of_2_foundation
+# Import ATC Recognition Phase
+from atc_recognition_phase import RecognitionProcessor, RecognitionPhaseIntegrator, create_recognition_phase
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
