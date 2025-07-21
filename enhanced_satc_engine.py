@@ -863,6 +863,23 @@ class EnhancedSATCEngine:
                 )
                 logger.info("📚 Pattern learned for future Recognition")
             
+            # Step 3: 16D Reflection (if enabled and cognition was used)
+            if result.get('phase', '').startswith('cognition') and self.using_reflection_16d:
+                logger.info("🧘 Phase 3: Reflection (16D)")
+                try:
+                    reflection_result = self.reflection_processor.reflect(result)
+                    if reflection_result['success']:
+                        # Enhance result with reflection insights
+                        result['reflection'] = reflection_result
+                        result['meta_coherence'] = reflection_result.get('meta_analysis', {}).get('meta_coherence', 0.0)
+                        result['self_awareness'] = reflection_result.get('self_awareness_level', 0.0)
+                        result['reflection_insights'] = reflection_result.get('insights', [])
+                        logger.info(f"✅ Reflection complete: meta-coherence={result['meta_coherence']:.3f}")
+                    else:
+                        logger.warning("⚠️  Reflection failed, continuing without reflection")
+                except Exception as e:
+                    logger.warning(f"⚠️  Reflection error: {str(e)}")
+            
             return result
             
         except Exception as e:
