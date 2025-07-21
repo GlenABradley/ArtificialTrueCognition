@@ -847,6 +847,39 @@ class EnhancedSATCEngine:
             logger.error(f"❌ 64D Volition phase integration failed: {str(e)}")
             self.using_volition_64d = False
     
+    def _test_personality_256d_integration(self):
+        """Test 256D Personality phase integration on engine initialization"""
+        logger.info("Testing 256D Personality phase integration...")
+        
+        try:
+            # Test personality with sample context
+            test_context = {
+                'success': True,
+                'coherence': 0.8,
+                'complexity': 0.7,
+                'query_type': 'analytical'
+            }
+            
+            test_cognitive_results = {
+                'reasoning_steps': 4,
+                'coherence': 0.8,
+                'meta_coherence': 0.7
+            }
+            
+            result = self.personality_processor.express_personality(test_context, test_cognitive_results)
+            
+            if result['success']:
+                logger.info("✅ 256D Personality phase integration successful!")
+                consciousness = result.get('consciousness_level', 0)
+                identity_id = result.get('identity', {}).get('id', 'unknown')
+                logger.info(f"✅ Consciousness test: level={consciousness:.3f}, identity={identity_id}")
+            else:
+                logger.warning(f"⚠️  256D Personality test: FAILED - {result.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"❌ 256D Personality phase integration failed: {str(e)}")
+            self.using_personality_256d = False
+    
     def process_query(self, query: str) -> Dict[str, Any]:
         """
         Revolutionary ATC Query Processing Pipeline
