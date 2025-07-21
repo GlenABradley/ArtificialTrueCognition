@@ -1390,6 +1390,16 @@ class EnhancedSATCEngine:
             # Convert to numpy for sememe database query
             node_np = node.detach().cpu().numpy()
             
+            # Project HD node to sememe database dimension (784)
+            if len(node_np) != self.sememe_db.embedding_dim:
+                if len(node_np) > self.sememe_db.embedding_dim:
+                    # Truncate to match sememe database dimension
+                    node_np = node_np[:self.sememe_db.embedding_dim]
+                else:
+                    # Pad with zeros to match sememe database dimension
+                    padding = np.zeros(self.sememe_db.embedding_dim - len(node_np))
+                    node_np = np.concatenate([node_np, padding])
+            
             # Find nearest sememes
             nearest_sememes = self.sememe_db.find_nearest(node_np, k=3)
             
