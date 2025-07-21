@@ -623,6 +623,7 @@ class EnhancedSATCEngine:
             self.using_recognition_phase = False
             self.using_cognition_4d = False
             self.using_reflection_16d = False
+            self.using_volition_64d = False
             # Define consistent square dimensions (legacy)
             self.embedding_dim = self.config.embedding_dim  # Square embedding dimension (784)
             self.structure_dim = self.config.layer_squares[-1]  # Final square dimension (1)
