@@ -73,7 +73,7 @@ layer_squares = [
 ├── enhanced_satc_engine.py          # Main Enhanced SATC Engine with square architecture
 ├── satc_training_pipeline.py        # Training pipeline with square dimensions
 ├── bulk_training_system.py          # Bulk training system for large-scale learning
-├── core_satc_engine.py             # Core SATC engine implementation
+├── enhanced_satc_engine.py        # Enhanced SATC engine implementation (current)
 ├── backend/                         # FastAPI backend API
 │   ├── server.py                    # API server with all endpoints
 │   ├── requirements.txt             # Python dependencies
