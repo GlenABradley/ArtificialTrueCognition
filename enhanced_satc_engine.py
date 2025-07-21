@@ -650,7 +650,8 @@ class EnhancedSATCEngine:
             'processing_times': [],
             'memory_updates': 0,
             'total_queries': 0,
-            'power_of_2_active': self.using_power_of_2  # Track architecture type
+            'power_of_2_active': self.using_power_of_2,  # Track architecture type
+            'recognition_phase_active': self.using_recognition_phase  # Track Recognition phase
         }
         
         # Training data for SOM
