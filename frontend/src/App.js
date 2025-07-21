@@ -85,7 +85,7 @@ const TrainingInterface = () => {
 
   return (
     <div className="training-interface">
-      <h2>🎓 Training Interface</h2>
+      <h2>🎓 Neural Network Training Interface</h2>
       
       {/* Training Configuration */}
       <div className="training-config">
