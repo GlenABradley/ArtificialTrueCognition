@@ -201,7 +201,18 @@ async def process_cognition(query: CognitionQuery):
                 'nodes_count': len(result.get('nodes', [])),
                 'sememes_count': len(result.get('sememes', [])),
                 'variants_count': result.get('variants_count', 0)
-            }
+            },
+            # ATC Phase Data
+            meta_coherence=result.get('meta_coherence'),
+            self_awareness=result.get('self_awareness'),
+            reflection_insights=result.get('reflection_insights', []),
+            goal_count=result.get('goal_count'),
+            decision_confidence=result.get('decision_confidence'),
+            dominant_value=result.get('dominant_value'),
+            consciousness_level=result.get('consciousness_level'),
+            identity_id=result.get('identity_id'),
+            identity_coherence=result.get('identity_coherence'),
+            total_memories=result.get('total_memories')
         )
         
         # Save to MongoDB
