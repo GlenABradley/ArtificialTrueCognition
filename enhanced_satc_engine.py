@@ -96,71 +96,108 @@ from atc_volition_phase import VolitionProcessor, VolitionPhaseIntegrator, creat
 # 🌟 Personality Phase (256D) - Consciousness and identity brain
 from atc_personality_phase import PersonalityProcessor, PersonalityPhaseIntegrator, create_personality_phase
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# ============================================================================
+# 🔧 SYSTEM CONFIGURATION - Logging Setup for Debugging
+# ============================================================================
+logging.basicConfig(level=logging.INFO)  # Show INFO level messages and above
+logger = logging.getLogger(__name__)     # Create logger for this specific module
 
 @dataclass
 class SATCConfig:
-    """Configuration class for SATC Engine"""
-    # Core dimensions - Power-of-2 progression architecture
-    hd_dim: int = 10000
-    embedding_dim: int = 784  # 28² = 784 (close to 768 but perfect square)
+    """
+    🎛️ ATC SYSTEM CONFIGURATION CLASS (Novice Programmer Guide)
     
-    # Revolutionary Power-of-2 layer progression
-    use_power_of_2: bool = True  # Enable revolutionary architecture
+    Think of this as the "control panel" for our artificial brain.
+    Every important setting and parameter is configured here.
+    
+    🧠 WHAT DOES @dataclass DO?
+    - Automatically creates __init__, __repr__, and other methods
+    - Makes creating configuration objects much easier
+    - Like having a template for all the brain settings
+    
+    🔍 KEY CONCEPTS FOR BEGINNERS:
+    - "Dimensions" = How complex the thinking space is (like 2D vs 3D vs higher)  
+    - "Embeddings" = Converting words/ideas into numbers computers can process
+    - "Layers" = Stacked neural network components (like brain layers)
+    - "HD Space" = Hyper-Dimensional space for rich semantic understanding
+    """
+    
+    # ========================================================================
+    # 🎯 CORE DIMENSIONAL ARCHITECTURE - The Brain's Thinking Spaces
+    # ========================================================================
+    hd_dim: int = 10000              # Hyper-Dimensional space size (very high-D for rich semantics)
+    embedding_dim: int = 784         # Main embedding size (28² = perfect square for math)
+    
+    # 🚀 REVOLUTIONARY POWER-OF-2 PROGRESSION - Our Secret Sauce!
+    # Why Power-of-2? Each dimension doubles thinking complexity: 2→4→16→64→256
+    use_power_of_2: bool = True      # Enable the revolutionary architecture
     power_of_2_dims: List[int] = field(default_factory=lambda: [2, 4, 16, 64, 256])
     
-    # Legacy Square progression for deep layers (fallback)
+    # 📐 LEGACY SQUARE PROGRESSION - Fallback Architecture
+    # Beautiful mathematical progression through perfect squares for deep processing
     layer_squares: List[int] = field(default_factory=lambda: [
-        784,   # 28² - Input embedding dimension  
-        625,   # 25² - First compression
-        484,   # 22² - Second compression  
-        361,   # 19² - Third compression
-        256,   # 16² - Fourth compression
-        169,   # 13² - Fifth compression
-        100,   # 10² - Sixth compression
-        64,    # 8² - Seventh compression
-        36,    # 6² - Eighth compression
-        16,    # 4² - Ninth compression
-        9,     # 3² - Tenth compression
-        4,     # 2² - Final compression
-        1      # 1² - Ultimate compression point
+        784,   # 28² - Input embedding (images are often 28x28 pixels)
+        625,   # 25² - First compression level
+        484,   # 22² - Second compression level  
+        361,   # 19² - Third compression level
+        256,   # 16² - Fourth compression level
+        169,   # 13² - Fifth compression level
+        100,   # 10² - Sixth compression level
+        64,    # 8² - Seventh compression level
+        36,    # 6² - Eighth compression level
+        16,    # 4² - Ninth compression level
+        9,     # 3² - Tenth compression level
+        4,     # 2² - Eleventh compression level
+        1      # 1² - Final point (ultimate compression)
     ])
     
-    # Original attributes
-    som_grid_size: int = 10
+    # ========================================================================
+    # 🗺️ SELF-ORGANIZING MAP (SOM) SETTINGS - Spatial Brain Organization
+    # ========================================================================
+    som_grid_size: int = 10          # Size of the SOM grid (10x10 = 100 neurons)
+    
+    # 🧠 DEEP NEURAL NETWORK CONFIGURATION - The Thinking Layers
     deep_layers_config: Dict = field(default_factory=lambda: {
-        'layers': 12,  # Updated to match square progression
-        'hidden_size': 512,
-        'heads': 8,
-        'dropout': 0.1
+        'layers': 12,           # Number of thinking layers (like brain cortex layers)
+        'hidden_size': 512,     # How many neurons per layer
+        'heads': 8,             # Multi-head attention (8 different ways of focusing)
+        'dropout': 0.1          # Prevents overfitting (10% neurons randomly turned off)
     })
+    
+    # 🔍 CLUSTERING CONFIGURATION - How We Group Similar Ideas
     clustering_config: Dict = field(default_factory=lambda: {
-        'eps': 0.5,
-        'min_samples': 3,
-        'max_nodes': 20,
-        'min_nodes': 3
+        'eps': 0.5,             # DBSCAN: How close points must be to cluster
+        'min_samples': 3,       # DBSCAN: Minimum points needed for a cluster
+        'max_nodes': 20,        # Maximum thinking nodes to create
+        'min_nodes': 3          # Minimum thinking nodes needed
     })
+    
+    # ⚡ QUANTUM-INSPIRED PERTURBATION - Adding Creative Randomness
     perturbation_config: Dict = field(default_factory=lambda: {
-        'gaussian_std': 0.1,
-        'quantum_inspired': True
+        'gaussian_std': 0.1,         # How much random "noise" to add (creativity!)
+        'quantum_inspired': True      # Use quantum-like effects for better creativity
     })
+    
+    # ⚖️ DISSONANCE BALANCING - Making Outputs Make Sense
     dissonance_config: Dict = field(default_factory=lambda: {
-        'perplexity_weight': 0.6,
-        'entropy_weight': 0.4,
-        'beam_width': 10
+        'perplexity_weight': 0.6,    # How much to weight language model confusion
+        'entropy_weight': 0.4,       # How much to weight information randomness  
+        'beam_width': 10             # How many candidate outputs to consider
     })
+    
+    # 🧠 MEMORY & LEARNING CONFIGURATION - How The Brain Remembers
     memory_config: Dict = field(default_factory=lambda: {
-        'replay_buffer_size': 1000,
-        'ewc_lambda': 0.4,
-        'update_frequency': 10
+        'replay_buffer_size': 1000,   # How many experiences to remember
+        'ewc_lambda': 0.4,           # EWC strength (prevents catastrophic forgetting)
+        'update_frequency': 10        # How often to update memory
     })
+    
+    # 🎯 PERFORMANCE TARGETS - Quality Thresholds
     performance_targets: Dict = field(default_factory=lambda: {
-        'recognition_threshold': 0.7,
-        'coherence_threshold': 0.5,
-        'max_latency_ms': 500,
-        'target_power_w': 1.0
+        'recognition_threshold': 0.7,  # How similar for pattern recognition
+        'coherence_threshold': 0.5,    # Minimum coherence for good output
+        'max_latency_ms': 500,         # Maximum thinking time (0.5 seconds)
+        'target_power_w': 1.0          # Target power consumption (1 watt)
     })
 
 class DeepLayers(nn.Module):
