@@ -668,7 +668,8 @@ class EnhancedSATCEngine:
             'total_queries': 0,
             'power_of_2_active': self.using_power_of_2,  # Track architecture type
             'recognition_phase_active': self.using_recognition_phase,  # Track Recognition phase
-            'cognition_4d_active': self.using_cognition_4d  # Track 4D Cognition phase
+            'cognition_4d_active': self.using_cognition_4d,  # Track 4D Cognition phase
+            'reflection_16d_active': self.using_reflection_16d  # Track 16D Reflection phase
         }
         
         # Training data for SOM
