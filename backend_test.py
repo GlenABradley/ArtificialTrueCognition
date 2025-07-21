@@ -161,10 +161,13 @@ class SATCBackendTester:
                     phase_details.append("Recognition (2D): Pattern matching")
                 
                 # Cognition (4D) - Check reasoning steps
-                reasoning_steps = len(data.get('metadata', {}).get('reasoning_steps', []))
-                if reasoning_steps > 0 or 'cognition' in phase.lower():
+                reasoning_steps = data.get('metadata', {}).get('reasoning_steps', [])
+                if reasoning_steps and len(reasoning_steps) > 0:
                     phases_active += 1
-                    phase_details.append(f"Cognition (4D): {reasoning_steps} reasoning steps")
+                    phase_details.append(f"Cognition (4D): {len(reasoning_steps)} reasoning steps")
+                elif 'cognition' in phase.lower():
+                    phases_active += 1
+                    phase_details.append("Cognition (4D): Active")
                 
                 # Reflection (16D) - Check meta-coherence
                 if meta_coherence is not None and meta_coherence > 0:
