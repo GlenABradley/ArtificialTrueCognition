@@ -1,0 +1,8 @@
+Best parameters:
+tolerance_power: 7.985775569916307
+euclidean_scale: 0.9988304703442028
+matching_threshold: 0.7796910002727695
+similarity_scale: 6.008816563670222
+similarity_shift: 4.513744253250553
+
+Best test score: 0.3333
