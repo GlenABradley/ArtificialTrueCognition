@@ -107,7 +107,7 @@ class EnhancedNegationSemanticField:
             'noise_threshold': 0.1,                  # Threshold for detecting noise contamination
             'adaptive_threshold_enabled': True,      # Enable adaptive similarity thresholds
             'incompatible_query_max_results': 3,     # Max results for highly incompatible queries
-            'incompatible_similarity_threshold': 0.4, # Similarity threshold for incompatible queries
+            'incompatible_similarity_threshold': 0.6, # Similarity threshold for incompatible queries (stricter)
         }
         
         # Initialize analysis components
