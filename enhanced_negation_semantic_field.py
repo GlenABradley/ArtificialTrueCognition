@@ -26,16 +26,24 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'syncopation_engine', 'core'))
 
+# Define minimal implementations first
+class SemanticParticle:
+    def __init__(self, concept: str, vector: torch.Tensor, metadata: Dict = None):
+        self.concept = concept
+        self.vector = vector
+        self.metadata = metadata or {}
+
+class SemanticField:
+    def __init__(self):
+        self.particles = []
+        
 try:
-    from semantic_axis import SemanticParticle, SemanticField
+    from semantic_axis import SemanticParticle as OriginalSemanticParticle, SemanticField as OriginalSemanticField
+    # Use original if available
+    SemanticParticle = OriginalSemanticParticle
+    SemanticField = OriginalSemanticField
 except ImportError:
-    print("Warning: Could not import SemanticParticle and SemanticField. Using minimal implementations.")
-    
-    class SemanticParticle:
-        def __init__(self, concept: str, vector: torch.Tensor, metadata: Dict = None):
-            self.concept = concept
-            self.vector = vector
-            self.metadata = metadata or {}
+    print("Warning: Could not import original SemanticField. Using minimal implementations.")
 
 class IncompatibilityType(Enum):
     """Types of semantic incompatibility"""
