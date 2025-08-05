@@ -356,19 +356,32 @@ class EnhancedNegationSemanticField:
             query_vector, particle.vector, query_analysis.contradiction_dimensions
         )
         
-        # Combine penalties
-        total_penalty = (
-            self.config['incompatibility_penalty_weight'] * incompatibility_penalty +
-            self.config['dimensional_contradiction_weight'] * contradiction_penalty
-        )
-        
-        # Apply penalties multiplicatively for stronger effect
-        penalized_similarity = base_similarity * (1.0 - total_penalty)
+        # For highly incompatible queries, apply aggressive filtering
+        if query_analysis.incompatibility_score > self.config['max_acceptable_incompatibility']:
+            # Apply exponential penalty scaling for incompatible queries
+            total_penalty = (
+                incompatibility_penalty * 2.0 +  # Double incompatibility penalty
+                contradiction_penalty * 1.5      # Increase contradiction penalty
+            )
+            
+            # Use exponential decay for very strong penalty effect
+            penalty_multiplier = math.exp(-total_penalty * 3.0)  # Aggressive decay
+            penalized_similarity = base_similarity * penalty_multiplier
+            
+        else:
+            # Normal penalty calculation for compatible queries
+            total_penalty = (
+                self.config['incompatibility_penalty_weight'] * incompatibility_penalty +
+                self.config['dimensional_contradiction_weight'] * contradiction_penalty
+            )
+            
+            # Apply penalties multiplicatively for stronger effect
+            penalized_similarity = base_similarity * (1.0 - min(0.95, total_penalty))
         
         # Weight with base similarity
         final_similarity = (
-            self.config['base_similarity_weight'] * base_similarity +
-            (1.0 - self.config['base_similarity_weight']) * penalized_similarity
+            self.config['base_similarity_weight'] * penalized_similarity +
+            (1.0 - self.config['base_similarity_weight']) * base_similarity
         )
         
         # Ensure valid range
