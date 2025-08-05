@@ -393,7 +393,7 @@ class EnhancedNegationSemanticField:
         if query_analysis.incompatibility_score == 0.0:
             return 0.0
         
-        penalty = 0.0
+        max_penalty = 0.0
         
         # Check if particle cluster is involved in any incompatible combination
         for cluster_name, blend_ratio in query_analysis.cluster_blend_ratio.items():
@@ -405,9 +405,21 @@ class EnhancedNegationSemanticField:
                 if {particle_cluster, cluster_name}.issubset(rule.cluster_pair):
                     # Apply penalty weighted by blend ratio and rule strength
                     rule_penalty = rule.penalty_strength * blend_ratio
-                    penalty = max(penalty, rule_penalty)
+                    max_penalty = max(max_penalty, rule_penalty)
+                    
+        # Also check direct cluster incompatibility from analysis
+        dominant_cluster_names = set(name for name, _ in query_analysis.dominant_clusters)
+        if particle_cluster in dominant_cluster_names:
+            # Particle matches a dominant cluster - check if that cluster is incompatible
+            for rule in self.incompatibility_rules:
+                if {particle_cluster}.issubset(rule.cluster_pair):
+                    # Check if the other cluster in the rule is also dominant
+                    other_clusters = rule.cluster_pair - {particle_cluster}
+                    if other_clusters.intersection(dominant_cluster_names):
+                        # Both clusters in incompatible pair are present
+                        max_penalty = max(max_penalty, rule.penalty_strength * 0.8)
         
-        return penalty
+        return max_penalty
     
     def _calculate_dimensional_contradiction_penalty(self, query_vector: torch.Tensor,
                                                    particle_vector: torch.Tensor,
