@@ -56,9 +56,10 @@ class SemanticFieldNegationPatch:
         """
         Apply negation patch to a SemanticField instance
         """
-        # Store original methods
+        # Store original methods (if they exist)
         field._original_find_similar = field.find_similar
-        field._original_calculate_similarity = field._calculate_similarity
+        if hasattr(field, '_calculate_similarity'):
+            field._original_calculate_similarity = field._calculate_similarity
         
         # Initialize negation components
         field._negation_config = {
