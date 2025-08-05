@@ -472,15 +472,27 @@ class EnhancedNegationSemanticField:
     def _apply_adaptive_threshold(self, similarities: List[Tuple[SemanticParticle, float]],
                                 query_analysis: QueryAnalysis) -> List[Tuple[SemanticParticle, float]]:
         """Apply adaptive threshold based on query analysis"""
+        
+        # For highly incompatible queries, apply very strict filtering
         if query_analysis.incompatibility_score > self.config['max_acceptable_incompatibility']:
-            # For highly incompatible queries, apply stricter threshold
-            strict_threshold = 0.8
+            # Use stricter threshold and limit results
+            strict_threshold = self.config['incompatible_similarity_threshold']
             similarities = [(p, s) for p, s in similarities if s >= strict_threshold]
+            
+            # Limit number of results for incompatible queries
+            max_results = self.config['incompatible_query_max_results']
+            similarities = similarities[:max_results]
+            
         elif query_analysis.semantic_coherence < 0.3:
             # For incoherent queries, apply moderate threshold
             moderate_threshold = 0.6
             similarities = [(p, s) for p, s in similarities if s >= moderate_threshold]
         
+        elif len(query_analysis.contradiction_dimensions) > 3:
+            # For highly contradictory queries, apply threshold
+            contradiction_threshold = 0.5
+            similarities = [(p, s) for p, s in similarities if s >= contradiction_threshold]
+            
         return similarities
     
     def get_incompatibility_report(self, query_vector: torch.Tensor) -> Dict[str, Any]:
