@@ -99,13 +99,15 @@ class EnhancedNegationSemanticField:
         
         # Configuration
         self.config = {
-            'base_similarity_weight': 0.6,           # Weight for base similarity calculation
-            'incompatibility_penalty_weight': 0.8,   # Weight for incompatibility penalties  
-            'dimensional_contradiction_weight': 0.3, # Weight for dimensional contradictions
+            'base_similarity_weight': 0.4,           # Weight for base similarity calculation
+            'incompatibility_penalty_weight': 2.0,   # Weight for incompatibility penalties (increased)
+            'dimensional_contradiction_weight': 0.8, # Weight for dimensional contradictions (increased)
             'cluster_inference_threshold': 0.3,      # Minimum confidence for cluster inference
-            'max_acceptable_incompatibility': 0.5,   # Maximum incompatibility before strong penalty
+            'max_acceptable_incompatibility': 0.4,   # Maximum incompatibility before strong penalty (stricter)
             'noise_threshold': 0.1,                  # Threshold for detecting noise contamination
             'adaptive_threshold_enabled': True,      # Enable adaptive similarity thresholds
+            'incompatible_query_max_results': 3,     # Max results for highly incompatible queries
+            'incompatible_similarity_threshold': 0.4, # Similarity threshold for incompatible queries
         }
         
         # Initialize analysis components
